@@ -4,10 +4,14 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.Background;
 using Windows.Devices.Bluetooth;
+using Windows.Devices.Bluetooth.Rfcomm;
 using Windows.Devices.Enumeration;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Networking.Sockets;
+using Windows.Storage.Streams;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -31,29 +35,87 @@ namespace TethermoteWindows
     /// </summary>
     public sealed partial class MainPage : Page
     {
-
-        public IList<DeviceInfo> Devices => GetDevices().Result;
-
-        private async Task<IList<DeviceInfo>> GetDevices()
+        private readonly Guid serviceUuid = new Guid("5dc6ece2-3e0d-4425-ac00-e444be6b56cb");
+        public async Task<IList<DeviceInfo>> GetDevices()
         {
-            var selector = BluetoothDevice.GetDeviceSelector();
-            var devices = await DeviceInformation.FindAllAsync(selector);
-            return devices.Select(d => new DeviceInfo { Name = d.Name, Device = d }).ToList();
+            try
+            {
+                var selector = RfcommDeviceService.GetDeviceSelector(RfcommServiceId.FromUuid(serviceUuid));
+                //var selector = BluetoothDevice.GetDeviceSelectorFromPairingState(true);
+                var devices = await DeviceInformation.FindAllAsync(selector);
+                return devices.Select(d => new DeviceInfo { Name = d.Name, Device = d }).ToList();
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
         }
+
+        SystemTrigger powerTrigger;
+        BackgroundTaskBuilder powerTask;
+        BackgroundTaskRegistration powerTaskRegistration;
 
         public MainPage()
         {
             this.InitializeComponent();
         }
 
-        private void button_Checked(object sender, RoutedEventArgs e)
+        private async Task<byte> sendBluetooth(DeviceInformation dev, byte state)
         {
-            sendBluetooth((button.IsChecked ?? false) ? 1 : 0);
+            var service = await RfcommDeviceService.FromIdAsync(dev.Id);
+            var socket = new StreamSocket();
+            await socket.ConnectAsync(service.ConnectionHostName, service.ConnectionServiceName, SocketProtectionLevel.BluetoothEncryptionWithAuthentication);
+            using (var outstream = socket.OutputStream.AsStreamForWrite())
+            {
+                await outstream.WriteAsync(new byte[] { state }, 0, 1);
+            }
+            using (var instream = socket.InputStream.AsStreamForRead())
+            {
+                var buf = new byte[1];
+                int red = await instream.ReadAsync(buf, 0, 1);
+                if (red == 1) return buf[0];
+                return 2;
+            }
+
         }
 
-        private void sendBluetooth(int v)
+        private async void comboBox_Loaded(object sender, RoutedEventArgs e)
         {
+            comboBox.Items.Clear();
+            foreach (var item in await GetDevices())
+            {
+                comboBox.Items.Add(item);
+            }
+        }
 
+        private async void button_Click(object sender, RoutedEventArgs e)
+        {
+            var newstate = await sendBluetooth(((DeviceInfo)comboBox.SelectedItem).Device,
+                (button.IsChecked ?? false) ? (byte)1 : (byte)0);
+            if (newstate > 1) return;
+            button.IsChecked = (newstate == 0) ? false : true;
+        }
+
+        private async void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (await BackgroundExecutionManager.RequestAccessAsync() == BackgroundAccessStatus.AllowedMayUseActiveRealTimeConnectivity)
+            {
+
+                powerTrigger = new SystemTrigger(SystemTriggerType.PowerStateChange, false);
+                powerTask = new BackgroundTaskBuilder();
+                powerTask.Name = "PowerTrigger";
+                powerTask.TaskEntryPoint = "Tasks.PowerTriggerTask";
+                powerTask.SetTrigger(powerTrigger);
+
+                if (!BackgroundTaskRegistration.AllTasks.Values.Any(t => t.Name == powerTask.Name))
+                {
+                    powerTaskRegistration = powerTask.Register();
+                    powerTaskRegistration.Progress += (a, b) =>
+                    {
+
+                    };
+                }
+            }
         }
     }
 }
