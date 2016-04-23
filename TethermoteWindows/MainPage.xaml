@@ -1,0 +1,41 @@
+﻿<Page
+    x:Class="TethermoteWindows.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:TethermoteWindows"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <ComboBox Header="Remote device name" x:Name="comboBox" HorizontalAlignment="Left" Margin="10,149,0,0" VerticalAlignment="Top" Width="340"/>
+        <ToggleSwitch x:Name="toggleSwitch_Copy" Header="Enable WiFi tethering on screen on" HorizontalAlignment="Left" Margin="10,214,0,0" VerticalAlignment="Top" Width="340"/>
+        <ToggleSwitch x:Name="toggleSwitch" Header="Disable WiFi tethering on screen off" HorizontalAlignment="Left" Margin="10,279,0,0" VerticalAlignment="Top" Width="340"/>
+        <ToggleButton x:Name="button" Content="Tap to Enable" HorizontalAlignment="Left" Height="72" Margin="10,10,0,0" VerticalAlignment="Top" Width="330" FontSize="40" ClickMode="Press">
+            <ToggleButton.Style>
+                <Style TargetType="ToggleButton">
+                    <Style.Triggers>
+                        <Trigger Property="IsChecked" Value="false">
+                            <Setter Property="Content">
+                                <Setter.Value>
+                                    <Image Source="/3DSuit_01;component/Images/Rec_Mode.png"></Image>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="true">
+                            <Setter Property="Content">
+                                <Setter.Value>
+                                    <Image Source="/3DSuit_01;component/Images/Play.png"></Image>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ToggleButton.Style>
+        </ToggleButton>
+
+    </Grid>
+</Page>
