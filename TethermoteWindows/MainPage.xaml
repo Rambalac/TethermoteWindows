@@ -6,36 +6,28 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
-
+    
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="27*"/>
+        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <ComboBox Header="Remote device name" x:Name="comboBox" HorizontalAlignment="Left" Margin="10,149,0,0" VerticalAlignment="Top" Width="340"/>
-        <ToggleSwitch x:Name="toggleSwitch_Copy" Header="Enable WiFi tethering on screen on" HorizontalAlignment="Left" Margin="10,214,0,0" VerticalAlignment="Top" Width="340"/>
-        <ToggleSwitch x:Name="toggleSwitch" Header="Disable WiFi tethering on screen off" HorizontalAlignment="Left" Margin="10,279,0,0" VerticalAlignment="Top" Width="340"/>
-        <ToggleButton x:Name="button" Content="Tap to Enable" HorizontalAlignment="Left" Height="72" Margin="10,10,0,0" VerticalAlignment="Top" Width="330" FontSize="40" ClickMode="Press">
-            <ToggleButton.Style>
-                <Style TargetType="ToggleButton">
-                    <Style.Triggers>
-                        <Trigger Property="IsChecked" Value="false">
-                            <Setter Property="Content">
-                                <Setter.Value>
-                                    <Image Source="/3DSuit_01;component/Images/Rec_Mode.png"></Image>
-                                </Setter.Value>
-                            </Setter>
-                        </Trigger>
-                        <Trigger Property="IsChecked" Value="true">
-                            <Setter Property="Content">
-                                <Setter.Value>
-                                    <Image Source="/3DSuit_01;component/Images/Play.png"></Image>
-                                </Setter.Value>
-                            </Setter>
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </ToggleButton.Style>
-        </ToggleButton>
-
+        <ToggleButton x:Name="button" Content="Tap to Enable" HorizontalAlignment="Stretch" Margin="10,10,10,5" FontSize="40" ClickMode="Press" Checked="button_Checked" />
+        <ComboBox Header="Remote device name" x:Name="comboBox" Grid.Row="2" HorizontalAlignment="Stretch" Margin="10,0,10,0" ItemsSource="{x:Bind Devices}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="local:DeviceInfo">
+                        <TextBlock Text="{x:Bind Name}" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+        <ToggleSwitch x:Name="toggleSwitch_Copy" Header="Enable WiFi tethering on screen on" HorizontalAlignment="Stretch" Margin="10,2,10,0" Grid.Row="3"/>
+        <ToggleSwitch x:Name="toggleSwitch" Header="Disable WiFi tethering on screen off" HorizontalAlignment="Stretch" Margin="10,0,10,0" Grid.Row="4"/>
     </Grid>
 </Page>

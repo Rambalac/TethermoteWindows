@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
+using Windows.Devices.Bluetooth;
+using Windows.Devices.Enumeration;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -17,14 +20,40 @@ using Windows.UI.Xaml.Navigation;
 
 namespace TethermoteWindows
 {
+    public class DeviceInfo
+    {
+        public string Name { get; set; }
+        public DeviceInformation Device { get; set; }
+    }
+
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
     public sealed partial class MainPage : Page
     {
+
+        public IList<DeviceInfo> Devices => GetDevices().Result;
+
+        private async Task<IList<DeviceInfo>> GetDevices()
+        {
+            var selector = BluetoothDevice.GetDeviceSelector();
+            var devices = await DeviceInformation.FindAllAsync(selector);
+            return devices.Select(d => new DeviceInfo { Name = d.Name, Device = d }).ToList();
+        }
+
         public MainPage()
         {
             this.InitializeComponent();
+        }
+
+        private void button_Checked(object sender, RoutedEventArgs e)
+        {
+            sendBluetooth((button.IsChecked ?? false) ? 1 : 0);
+        }
+
+        private void sendBluetooth(int v)
+        {
+
         }
     }
 }
