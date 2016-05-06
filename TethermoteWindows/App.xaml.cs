@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
+using Windows.ApplicationModel.Background;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -35,12 +36,16 @@ namespace TethermoteWindows
             this.Suspending += OnSuspending;
         }
 
+        SystemTrigger powerTrigger;
+        BackgroundTaskBuilder powerTask;
+        BackgroundTaskRegistration powerTaskRegistration;
+
         /// <summary>
         /// Invoked when the application is launched normally by the end user.  Other entry points
         /// will be used such as when the application is launched to open a specific file.
         /// </summary>
         /// <param name="args">Details about the launch request and process.</param>
-        protected override void OnLaunched(LaunchActivatedEventArgs args)
+        protected async override void OnLaunched(LaunchActivatedEventArgs args)
         {
 #if DEBUG
             this.DebugSettings.EnableFrameRateCounter |= System.Diagnostics.Debugger.IsAttached;
@@ -76,6 +81,21 @@ namespace TethermoteWindows
                 }
                 // Ensure the current window is active
                 Window.Current.Activate();
+            }
+
+            if (await BackgroundExecutionManager.RequestAccessAsync() == BackgroundAccessStatus.AllowedMayUseActiveRealTimeConnectivity)
+            {
+
+                powerTrigger = new SystemTrigger(SystemTriggerType.PowerStateChange, false);
+                powerTask = new BackgroundTaskBuilder();
+                powerTask.Name = "PowerTrigger2";
+                powerTask.TaskEntryPoint = "TethermoteWindows.PowerStateTask";
+                powerTask.SetTrigger(powerTrigger);
+
+                if (!BackgroundTaskRegistration.AllTasks.Values.Any(t => t.Name == powerTask.Name))
+                {
+                    powerTaskRegistration = powerTask.Register();
+                }
             }
         }
 

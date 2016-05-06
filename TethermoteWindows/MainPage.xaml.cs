@@ -51,10 +51,6 @@ namespace TethermoteWindows
             }
         }
 
-        SystemTrigger powerTrigger;
-        BackgroundTaskBuilder powerTask;
-        BackgroundTaskRegistration powerTaskRegistration;
-
         public MainPage()
         {
             this.InitializeComponent();
@@ -90,32 +86,12 @@ namespace TethermoteWindows
 
         private async void button_Click(object sender, RoutedEventArgs e)
         {
-            var newstate = await sendBluetooth(((DeviceInfo)comboBox.SelectedItem).Device,
+            var device = (DeviceInfo)comboBox.SelectedItem;
+            if (device == null) return;
+            var newstate = await sendBluetooth(device.Device,
                 (button.IsChecked ?? false) ? (byte)1 : (byte)0);
             if (newstate > 1) return;
-            button.IsChecked = (newstate == 0) ? false : true;
-        }
-
-        private async void Page_Loaded(object sender, RoutedEventArgs e)
-        {
-            if (await BackgroundExecutionManager.RequestAccessAsync() == BackgroundAccessStatus.AllowedMayUseActiveRealTimeConnectivity)
-            {
-
-                powerTrigger = new SystemTrigger(SystemTriggerType.PowerStateChange, false);
-                powerTask = new BackgroundTaskBuilder();
-                powerTask.Name = "PowerTrigger";
-                powerTask.TaskEntryPoint = "Tasks.PowerTriggerTask";
-                powerTask.SetTrigger(powerTrigger);
-
-                if (!BackgroundTaskRegistration.AllTasks.Values.Any(t => t.Name == powerTask.Name))
-                {
-                    powerTaskRegistration = powerTask.Register();
-                    powerTaskRegistration.Progress += (a, b) =>
-                    {
-
-                    };
-                }
-            }
+            button.IsChecked = (newstate != 0);
         }
     }
 }
