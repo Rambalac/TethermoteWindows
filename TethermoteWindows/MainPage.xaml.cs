@@ -12,6 +12,7 @@ using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Networking.Sockets;
 using Windows.Storage.Streams;
+using Windows.UI.StartScreen;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -56,25 +57,6 @@ namespace TethermoteWindows
             this.InitializeComponent();
         }
 
-        private async Task<byte> sendBluetooth(DeviceInformation dev, byte state)
-        {
-            var service = await RfcommDeviceService.FromIdAsync(dev.Id);
-            var socket = new StreamSocket();
-            await socket.ConnectAsync(service.ConnectionHostName, service.ConnectionServiceName, SocketProtectionLevel.BluetoothEncryptionWithAuthentication);
-            using (var outstream = socket.OutputStream.AsStreamForWrite())
-            {
-                await outstream.WriteAsync(new byte[] { state }, 0, 1);
-            }
-            using (var instream = socket.InputStream.AsStreamForRead())
-            {
-                var buf = new byte[1];
-                int red = await instream.ReadAsync(buf, 0, 1);
-                if (red == 1) return buf[0];
-                return 2;
-            }
-
-        }
-
         private async void comboBox_Loaded(object sender, RoutedEventArgs e)
         {
             comboBox.Items.Clear();
@@ -88,10 +70,17 @@ namespace TethermoteWindows
         {
             var device = (DeviceInfo)comboBox.SelectedItem;
             if (device == null) return;
-            var newstate = await sendBluetooth(device.Device,
+            var newstate = await App.SendBluetooth(device.Device,
                 (button.IsChecked ?? false) ? (byte)1 : (byte)0);
             if (newstate > 1) return;
             button.IsChecked = (newstate != 0);
+        }
+
+        private bool SwitchTileButtonEnabled => !SecondaryTile.Exists(App.SwitchTileId);
+
+        private async void AddSwitchTileButton_Click(object sender, RoutedEventArgs e)
+        {
+            await App.AddSwitchTile((FrameworkElement)sender, true);
         }
     }
 }

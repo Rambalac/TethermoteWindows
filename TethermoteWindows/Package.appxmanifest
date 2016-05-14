@@ -15,13 +15,18 @@
   </Resources>
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="TethermoteWindows.App">
-      <uap:VisualElements DisplayName="Tethermote" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" Description="Switch WiFi tethering remotly on Android devices with same app installed ." BackgroundColor="transparent">
+      <uap:VisualElements DisplayName="Tethermote Settings" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" Description="Switch WiFi tethering remotly on Android devices with same app installed ." BackgroundColor="transparent">
         <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png">
         </uap:DefaultTile>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
       <Extensions>
-        <Extension Category="windows.backgroundTasks" EntryPoint="TethermoteWindows.PowerStateTask">
+        <Extension Category="windows.backgroundTasks" EntryPoint="TethermoteWindows.UserAwayTask">
+          <BackgroundTasks>
+            <Task Type="systemEvent" />
+          </BackgroundTasks>
+        </Extension>
+        <Extension Category="windows.backgroundTasks" EntryPoint="TethermoteWindows.UserPresentTask">
           <BackgroundTasks>
             <Task Type="systemEvent" />
           </BackgroundTasks>

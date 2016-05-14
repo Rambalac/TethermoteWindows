@@ -7,7 +7,14 @@ using Windows.ApplicationModel.Background;
 
 namespace TethermoteWindows
 {
-    class PowerStateTask : IBackgroundTask
+    class UserPresentTask : IBackgroundTask
+    {
+        public void Run(IBackgroundTaskInstance taskInstance)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    class UserAwayTask : IBackgroundTask
     {
         public void Run(IBackgroundTaskInstance taskInstance)
         {

@@ -3,11 +3,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.ApplicationModel.Background;
+using Windows.Devices.Bluetooth.Rfcomm;
+using Windows.Devices.Enumeration;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Networking.Sockets;
+using Windows.UI.StartScreen;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -36,10 +41,6 @@ namespace TethermoteWindows
             this.Suspending += OnSuspending;
         }
 
-        SystemTrigger powerTrigger;
-        BackgroundTaskBuilder powerTask;
-        BackgroundTaskRegistration powerTaskRegistration;
-
         /// <summary>
         /// Invoked when the application is launched normally by the end user.  Other entry points
         /// will be used such as when the application is launched to open a specific file.
@@ -50,6 +51,13 @@ namespace TethermoteWindows
 #if DEBUG
             this.DebugSettings.EnableFrameRateCounter |= System.Diagnostics.Debugger.IsAttached;
 #endif
+
+            if (!string.IsNullOrWhiteSpace(args.Arguments))
+            {
+                SwitchTethering(args.Arguments == EnableSwitchArgument);
+
+                Exit();
+            }
             var rootFrame = Window.Current.Content as Frame;
 
             // Do not repeat app initialization when the Window already has content,
@@ -85,17 +93,28 @@ namespace TethermoteWindows
 
             if (await BackgroundExecutionManager.RequestAccessAsync() == BackgroundAccessStatus.AllowedMayUseActiveRealTimeConnectivity)
             {
+                AddSystemTrigger<UserPresentTask>(SystemTriggerType.UserPresent);
+                AddSystemTrigger<UserAwayTask>(SystemTriggerType.UserAway);
+            }
+        }
 
-                powerTrigger = new SystemTrigger(SystemTriggerType.PowerStateChange, false);
-                powerTask = new BackgroundTaskBuilder();
-                powerTask.Name = "PowerTrigger2";
-                powerTask.TaskEntryPoint = "TethermoteWindows.PowerStateTask";
-                powerTask.SetTrigger(powerTrigger);
+        private static async Task SwitchTethering(bool v)
+        {
+            await SendBluetooth(v?)
+            
+        }
 
-                if (!BackgroundTaskRegistration.AllTasks.Values.Any(t => t.Name == powerTask.Name))
-                {
-                    powerTaskRegistration = powerTask.Register();
-                }
+        private static void AddSystemTrigger<T>(SystemTriggerType trigger, string name = null) where T : IBackgroundTask
+        {
+            var systemTrigger = new SystemTrigger(trigger, false);
+            var task = new BackgroundTaskBuilder();
+            task.Name = name ?? typeof(T).FullName;
+            task.TaskEntryPoint = typeof(T).FullName;
+            task.SetTrigger(systemTrigger);
+
+            if (!BackgroundTaskRegistration.AllTasks.Values.Any(t => t.Name == task.Name))
+            {
+                var taskRegistration = task.Register();
             }
         }
 
@@ -121,6 +140,54 @@ namespace TethermoteWindows
             var deferral = e.SuspendingOperation.GetDeferral();
             //TODO: Save application state and stop any background activity
             deferral.Complete();
+        }
+
+        const string EnableSwitchArgument = "enable";
+        const string DisableSwitchArgument = "disable";
+
+        public const string SwitchTileId = "SwitchTile";
+
+        private static Rect GetElementRect(FrameworkElement _element)
+        {
+            Rect rectangleBounds = new Rect();
+            rectangleBounds = _element.RenderTransform.TransformBounds(new Rect(0, 0, _element.Width, _element.Height));
+            return rectangleBounds;
+        }
+
+        public static async Task AddSwitchTile(FrameworkElement sender, bool enable)
+        {
+            var logo = new Uri("ms-appx:///Assets/s.png");
+            var smallLogo = new Uri("ms-appx:///Assets/smallTile-sdk.png");
+
+            var s = new SecondaryTile(SwitchTileId,
+                                                                "Title text shown on the tile",
+                                                                "Name of the tile the user sees when searching for the tile",
+                                                                (enable) ? EnableSwitchArgument : DisableSwitchArgument,
+                                                                TileOptions.ShowNameOnLogo,
+                                                                logo);
+            s.DisplayName = "mytiel";
+            // Specify a foreground text value.
+            s.ForegroundText = ForegroundText.Dark;
+            await s.RequestCreateForSelectionAsync(GetElementRect(sender), Windows.UI.Popups.Placement.Below);
+        }
+
+        public static async Task<byte> SendBluetooth(DeviceInformation dev, byte state)
+        {
+            var service = await RfcommDeviceService.FromIdAsync(dev.Id);
+            var socket = new StreamSocket();
+            await socket.ConnectAsync(service.ConnectionHostName, service.ConnectionServiceName, SocketProtectionLevel.BluetoothEncryptionWithAuthentication);
+            using (var outstream = socket.OutputStream.AsStreamForWrite())
+            {
+                await outstream.WriteAsync(new byte[] { state }, 0, 1);
+            }
+            using (var instream = socket.InputStream.AsStreamForRead())
+            {
+                var buf = new byte[1];
+                int red = await instream.ReadAsync(buf, 0, 1);
+                if (red == 1) return buf[0];
+                return 2;
+            }
+
         }
     }
 }
