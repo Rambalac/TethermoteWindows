@@ -36,22 +36,6 @@ namespace TethermoteWindows
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        private readonly Guid serviceUuid = new Guid("5dc6ece2-3e0d-4425-ac00-e444be6b56cb");
-        public async Task<IList<DeviceInfo>> GetDevices()
-        {
-            try
-            {
-                var selector = RfcommDeviceService.GetDeviceSelector(RfcommServiceId.FromUuid(serviceUuid));
-                //var selector = BluetoothDevice.GetDeviceSelectorFromPairingState(true);
-                var devices = await DeviceInformation.FindAllAsync(selector);
-                return devices.Select(d => new DeviceInfo { Name = d.Name, Device = d }).ToList();
-            }
-            catch (Exception e)
-            {
-                throw;
-            }
-        }
-
         public MainPage()
         {
             this.InitializeComponent();
@@ -60,19 +44,18 @@ namespace TethermoteWindows
         private async void comboBox_Loaded(object sender, RoutedEventArgs e)
         {
             comboBox.Items.Clear();
-            foreach (var item in await GetDevices())
+            var devices = await App.GetDevices();
+            foreach (var item in devices)
             {
                 comboBox.Items.Add(item);
+                if (item.Name == AppSettings.RemoteDevice) comboBox.SelectedItem = item;
             }
         }
 
         private async void button_Click(object sender, RoutedEventArgs e)
         {
-            var device = (DeviceInfo)comboBox.SelectedItem;
-            if (device == null) return;
-            var newstate = await App.SendBluetooth(device.Device,
-                (button.IsChecked ?? false) ? (byte)1 : (byte)0);
-            if (newstate > 1) return;
+            var newstate = await App.SwitchTethering(!(button.IsChecked ?? false));
+            if (newstate != TetheringStates.Enabled || newstate != TetheringStates.Disabled) return;
             button.IsChecked = (newstate != 0);
         }
 
@@ -80,7 +63,13 @@ namespace TethermoteWindows
 
         private async void AddSwitchTileButton_Click(object sender, RoutedEventArgs e)
         {
-            await App.AddSwitchTile((FrameworkElement)sender, true);
+            var enabled = await App.SendBluetooth(TetheringStates.GetState) == TetheringStates.Enabled;
+            await App.AddSwitchTile((FrameworkElement)sender, enabled);
+        }
+
+        private void comboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            AppSettings.RemoteDevice = ((DeviceInfo)comboBox.SelectedItem)?.Name;
         }
     }
 }

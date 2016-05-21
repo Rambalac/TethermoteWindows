@@ -9,6 +9,7 @@ using Windows.ApplicationModel.Activation;
 using Windows.ApplicationModel.Background;
 using Windows.Devices.Bluetooth.Rfcomm;
 using Windows.Devices.Enumeration;
+using Windows.Devices.WiFi;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Networking.Sockets;
@@ -52,12 +53,6 @@ namespace TethermoteWindows
             this.DebugSettings.EnableFrameRateCounter |= System.Diagnostics.Debugger.IsAttached;
 #endif
 
-            if (!string.IsNullOrWhiteSpace(args.Arguments))
-            {
-                SwitchTethering(args.Arguments == EnableSwitchArgument);
-
-                Exit();
-            }
             var rootFrame = Window.Current.Content as Frame;
 
             // Do not repeat app initialization when the Window already has content,
@@ -78,6 +73,17 @@ namespace TethermoteWindows
                 Window.Current.Content = rootFrame;
             }
 
+            if (!string.IsNullOrWhiteSpace(args.Arguments))
+            {
+                var state = await SwitchTethering(args.Arguments == EnableSwitchArgument);
+                await UpdateTile(state);
+                if (state == TetheringStates.Enabled)
+                {
+                    await WaitForWiFiConnection();
+                }
+                Exit();
+            }
+            else
             if (args.PrelaunchActivated == false)
             {
                 if (rootFrame.Content == null)
@@ -90,32 +96,48 @@ namespace TethermoteWindows
                 // Ensure the current window is active
                 Window.Current.Activate();
             }
+        }
 
-            if (await BackgroundExecutionManager.RequestAccessAsync() == BackgroundAccessStatus.AllowedMayUseActiveRealTimeConnectivity)
+        private async Task WaitForWiFiConnection()
+        {
+            var accessAllowed = await WiFiAdapter.RequestAccessAsync();
+            if (accessAllowed == WiFiAccessStatus.Allowed)
             {
-                AddSystemTrigger<UserPresentTask>(SystemTriggerType.UserPresent);
-                AddSystemTrigger<UserAwayTask>(SystemTriggerType.UserAway);
+                var adapterList = await DeviceInformation.FindAllAsync(WiFiAdapter.GetDeviceSelector());
+                var wifiAdapter = await WiFiAdapter.FromIdAsync(adapterList[0].Id);
+
+                for (int i = 0; i < 5; i++)
+                {
+                    await wifiAdapter.ScanAsync();
+                    await Task.Delay(100);
+                    if ((await wifiAdapter.NetworkAdapter.GetConnectedProfileAsync()) != null) break;
+                }
             }
         }
 
-        private static async Task SwitchTethering(bool v)
+        public static async Task<TetheringStates> SwitchTethering(bool v)
         {
-            await SendBluetooth(v?)
-            
+            return await SendBluetooth(v ? TetheringStates.Enabled : TetheringStates.Disabled);
         }
 
-        private static void AddSystemTrigger<T>(SystemTriggerType trigger, string name = null) where T : IBackgroundTask
-        {
-            var systemTrigger = new SystemTrigger(trigger, false);
-            var task = new BackgroundTaskBuilder();
-            task.Name = name ?? typeof(T).FullName;
-            task.TaskEntryPoint = typeof(T).FullName;
-            task.SetTrigger(systemTrigger);
+        private static readonly Guid serviceUuid = new Guid("5dc6ece2-3e0d-4425-ac00-e444be6b56cb");
 
-            if (!BackgroundTaskRegistration.AllTasks.Values.Any(t => t.Name == task.Name))
-            {
-                var taskRegistration = task.Register();
-            }
+        public static async Task<IEnumerable<DeviceInfo>> GetDevices()
+        {
+            var selector = RfcommDeviceService.GetDeviceSelector(RfcommServiceId.FromUuid(serviceUuid));
+            //var selector = BluetoothDevice.GetDeviceSelectorFromPairingState(true);
+            var devices = await DeviceInformation.FindAllAsync(selector);
+            return devices.Select(d => new DeviceInfo { Name = d.Name, Device = d });
+        }
+
+        public static async Task<TetheringStates> SendBluetooth(TetheringStates state)
+        {
+            if (AppSettings.RemoteDevice == null) return TetheringStates.Error;
+            var device = (await GetDevices()).SingleOrDefault(d => d.Name == AppSettings.RemoteDevice);
+            if (device == null) return TetheringStates.Error;
+            var result = await SendBluetooth(device.Device, (byte)state);
+
+            return (TetheringStates)result;
         }
 
         /// <summary>
@@ -154,21 +176,39 @@ namespace TethermoteWindows
             return rectangleBounds;
         }
 
-        public static async Task AddSwitchTile(FrameworkElement sender, bool enable)
+        private static readonly Uri logoOn = new Uri("ms-appx:///Assets/widget_on.png");
+        private static readonly Uri logoOff = new Uri("ms-appx:///Assets/widget_off.png");
+
+        public static async Task AddSwitchTile(FrameworkElement sender, bool enabled)
         {
-            var logo = new Uri("ms-appx:///Assets/s.png");
-            var smallLogo = new Uri("ms-appx:///Assets/smallTile-sdk.png");
+            var logo = enabled ? logoOn : logoOff;
 
             var s = new SecondaryTile(SwitchTileId,
                                                                 "Title text shown on the tile",
                                                                 "Name of the tile the user sees when searching for the tile",
-                                                                (enable) ? EnableSwitchArgument : DisableSwitchArgument,
-                                                                TileOptions.ShowNameOnLogo,
+                                                                (!enabled) ? EnableSwitchArgument : DisableSwitchArgument,
+                                                                TileOptions.None,
                                                                 logo);
-            s.DisplayName = "mytiel";
+
             // Specify a foreground text value.
             s.ForegroundText = ForegroundText.Dark;
             await s.RequestCreateForSelectionAsync(GetElementRect(sender), Windows.UI.Popups.Placement.Below);
+        }
+
+        private async Task UpdateTile(TetheringStates state)
+        {
+            var enabled = state == TetheringStates.Enabled;
+            var logo = enabled ? logoOn : logoOff;
+
+            var s = new SecondaryTile(SwitchTileId,
+                                                                "Title text shown on the tile",
+                                                                "Name of the tile the user sees when searching for the tile",
+                                                                (!enabled) ? EnableSwitchArgument : DisableSwitchArgument,
+                                                                TileOptions.None,
+                                                                logo);
+            // Specify a foreground text value.
+            s.ForegroundText = ForegroundText.Dark;
+            await s.UpdateAsync();
         }
 
         public static async Task<byte> SendBluetooth(DeviceInformation dev, byte state)

@@ -10,26 +10,21 @@
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="2*"/>
+            <RowDefinition Height="20"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="27*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <ToggleButton x:Name="button" Content="Tap to Enable" HorizontalAlignment="Stretch" Margin="10,10,10,5" FontSize="40" ClickMode="Press" Click="button_Click" />
-        <ComboBox Header="Remote device name" x:Name="comboBox" Grid.Row="2" HorizontalAlignment="Stretch" Margin="10,0,10,0" Loaded="comboBox_Loaded">
+        <ComboBox Header="Remote device name" x:Name="comboBox" Grid.Row="2" HorizontalAlignment="Stretch" Margin="10,0,10,0" Loaded="comboBox_Loaded" SelectionChanged="comboBox_SelectionChanged">
             <ComboBox.ItemTemplate>
                 <DataTemplate x:DataType="local:DeviceInfo">
                     <TextBlock Text="{x:Bind Name}" />
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <ToggleSwitch x:Name="toggleSwitch_Copy" Header="Enable WiFi tethering on screen on" HorizontalAlignment="Stretch" Margin="10,2,10,0" Grid.Row="3"/>
-        <ToggleSwitch x:Name="toggleSwitch" Header="Disable WiFi tethering on screen off" HorizontalAlignment="Stretch" Margin="10,0,10,0" Grid.Row="4"/>
-        <Button x:Name="addSwitchTileButton" Content="Add switch tile to Start Menu" HorizontalAlignment="Stretch" Margin="10,2,10,0" Grid.Row="5" Click="AddSwitchTileButton_Click"/>
+        <Button x:Name="addSwitchTileButton" Content="Add switch tile to Start Menu" HorizontalAlignment="Stretch" Margin="10,2,10,0" Grid.Row="3" Click="AddSwitchTileButton_Click"/>
     </Grid>
 </Page>
