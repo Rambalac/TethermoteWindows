@@ -63,8 +63,15 @@ namespace TethermoteWindows
 
         private async void AddSwitchTileButton_Click(object sender, RoutedEventArgs e)
         {
-            var enabled = await App.SendBluetooth(TetheringStates.GetState) == TetheringStates.Enabled;
-            await App.AddSwitchTile((FrameworkElement)sender, enabled);
+            try
+            {
+                var enabled = await App.SendBluetooth(TetheringStates.GetState) == TetheringStates.Enabled;
+                await App.AddSwitchTile((FrameworkElement)sender, enabled);
+            }
+            catch (Exception)
+            {
+                await App.AddSwitchTile((FrameworkElement)sender, false);
+            }
         }
 
         private void comboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)

@@ -13,6 +13,7 @@ using Windows.Devices.WiFi;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Networking.Sockets;
+using Windows.UI.Popups;
 using Windows.UI.StartScreen;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -75,13 +76,7 @@ namespace TethermoteWindows
 
             if (!string.IsNullOrWhiteSpace(args.Arguments))
             {
-                var state = await SwitchTethering(args.Arguments == EnableSwitchArgument);
-                await UpdateTile(state);
-                if (state == TetheringStates.Enabled)
-                {
-                    await WaitForWiFiConnection();
-                }
-                Exit();
+                await TileClicked(args.Arguments == EnableSwitchArgument);
             }
             else
             if (args.PrelaunchActivated == false)
@@ -96,6 +91,35 @@ namespace TethermoteWindows
                 // Ensure the current window is active
                 Window.Current.Activate();
             }
+        }
+
+        private async Task TileClicked(bool enable)
+        {
+            try
+            {
+                var state = await SwitchTethering(enable);
+                await UpdateTile(state);
+                if (state == TetheringStates.Enabled)
+                {
+                    await WaitForWiFiConnection();
+                }
+                else
+                    if (state == TetheringStates.Error)
+                {
+                    await ShowError();
+                }
+            }
+            catch (Exception)
+            {
+                await ShowError();
+            }
+            Exit();
+        }
+
+        static public async Task ShowError()
+        {
+            var dialog = new MessageDialog("Device can be too far for Bluetooth or its Bluetooth is disabled or device is turned off.\r\nIf device is near by but still does not work try to run Tethermote Settings on that device again.");
+            await dialog.ShowAsync();
         }
 
         private async Task WaitForWiFiConnection()
