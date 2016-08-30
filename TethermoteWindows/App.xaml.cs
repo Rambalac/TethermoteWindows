@@ -171,7 +171,7 @@ namespace TethermoteWindows
 
         private static Rect GetElementRect(FrameworkElement _element)
         {
-            Rect rectangleBounds = new Rect();
+            var rectangleBounds = new Rect();
             rectangleBounds = _element.RenderTransform.TransformBounds(new Rect(0, 0, _element.Width, _element.Height));
             return rectangleBounds;
         }

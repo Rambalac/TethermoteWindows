@@ -17,7 +17,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <ToggleButton x:Name="button" Content="Tap to Enable" HorizontalAlignment="Stretch" Margin="10,10,10,5" FontSize="40" ClickMode="Press" Click="button_Click" />
+        <ToggleButton x:Name="button" Content="Tap to Switch" HorizontalAlignment="Stretch" Margin="10,10,10,5" FontSize="40" ClickMode="Press" Click="button_Click" />
         <ComboBox Header="Remote device name" x:Name="comboBox" Grid.Row="2" HorizontalAlignment="Stretch" Margin="10,0,10,0" Loaded="comboBox_Loaded" SelectionChanged="comboBox_SelectionChanged">
             <ComboBox.ItemTemplate>
                 <DataTemplate x:DataType="local:DeviceInfo">
