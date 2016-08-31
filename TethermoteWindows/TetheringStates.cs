@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TethermoteWindows
 {
-    public enum TetheringStates
+    public enum TetheringState
     {
         Disabled = 0,
         Enabled = 1,

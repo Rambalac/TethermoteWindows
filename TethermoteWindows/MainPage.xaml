@@ -13,11 +13,14 @@
             <RowDefinition Height="20"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <ToggleButton x:Name="button" Content="Tap to Switch" HorizontalAlignment="Stretch" Margin="10,10,10,5" FontSize="40" ClickMode="Press" Click="button_Click" />
+        <ToggleButton x:Name="button" Content="Tap to Switch" HorizontalAlignment="Stretch" Margin="10,10,10,5" FontSize="40" ClickMode="Press" Click="switchButton_Click" />
         <ComboBox Header="Remote device name" x:Name="comboBox" Grid.Row="2" HorizontalAlignment="Stretch" Margin="10,0,10,0" Loaded="comboBox_Loaded" SelectionChanged="comboBox_SelectionChanged">
             <ComboBox.ItemTemplate>
                 <DataTemplate x:DataType="local:DeviceInfo">
@@ -26,5 +29,7 @@
             </ComboBox.ItemTemplate>
         </ComboBox>
         <Button x:Name="addSwitchTileButton" Content="Add switch tile to Start Menu" HorizontalAlignment="Stretch" Margin="10,2,10,0" Grid.Row="3" Click="AddSwitchTileButton_Click"/>
+        <Button x:Name="openDevicesSettings" Content="Open Devices Settings" HorizontalAlignment="Stretch" Margin="10,2,10,0" Grid.Row="5" VerticalAlignment="Top" Click="openDevicesSettings_Click" />
+        <Button x:Name="openWifiSettings" Content="Open WiFi Settings" HorizontalAlignment="Stretch" Margin="10,2,10,0" Grid.Row="6" VerticalAlignment="Top" Click="openWifiSettings_Click" />
     </Grid>
 </Page>

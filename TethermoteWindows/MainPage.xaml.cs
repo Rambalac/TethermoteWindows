@@ -12,6 +12,7 @@ using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Networking.Sockets;
 using Windows.Storage.Streams;
+using Windows.System;
 using Windows.UI.StartScreen;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -36,6 +37,8 @@ namespace TethermoteWindows
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        private DispatcherTimer timer;
+
         public MainPage()
         {
             this.InitializeComponent();
@@ -44,6 +47,23 @@ namespace TethermoteWindows
         private async void comboBox_Loaded(object sender, RoutedEventArgs e)
         {
             comboBox.Items.Clear();
+            await RefreshDevices();
+            timer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(10)
+            };
+
+            timer.Tick += Timer_Tick; ;
+            timer.Start();
+        }
+
+        private async void Timer_Tick(object sender, object e)
+        {
+            await RefreshDevices();
+        }
+
+        private async Task RefreshDevices()
+        {
             var devices = await App.GetDevices();
             foreach (var item in devices)
             {
@@ -52,11 +72,16 @@ namespace TethermoteWindows
             }
         }
 
-        private async void button_Click(object sender, RoutedEventArgs e)
+        private async void switchButton_Click(object sender, RoutedEventArgs e)
         {
-            var newstate = await App.SwitchTethering(!(button.IsChecked ?? false));
-            if (newstate != TetheringStates.Enabled || newstate != TetheringStates.Disabled) return;
-            button.IsChecked = (newstate != 0);
+            try
+            {
+                var newstate = await App.SwitchTethering(!(button.IsChecked ?? false));
+                button.IsChecked = newstate == TetheringState.Enabled;
+            } catch(Exception)
+            {
+                button.IsChecked = false;
+            }
         }
 
         private bool SwitchTileButtonEnabled => !SecondaryTile.Exists(App.SwitchTileId);
@@ -65,7 +90,7 @@ namespace TethermoteWindows
         {
             try
             {
-                var enabled = await App.SendBluetooth(TetheringStates.GetState) == TetheringStates.Enabled;
+                var enabled = await App.SendBluetooth(TetheringState.GetState) == TetheringState.Enabled;
                 await App.AddSwitchTile((FrameworkElement)sender, enabled);
             }
             catch (Exception)
@@ -77,6 +102,16 @@ namespace TethermoteWindows
         private void comboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             AppSettings.RemoteDevice = ((DeviceInfo)comboBox.SelectedItem)?.Name;
+        }
+
+        private async void openDevicesSettings_Click(object sender, RoutedEventArgs e)
+        {
+            await Launcher.LaunchUriAsync(new Uri("ms-settings:bluetooth"));
+        }
+
+        private async void openWifiSettings_Click(object sender, RoutedEventArgs e)
+        {
+            await Launcher.LaunchUriAsync(new Uri("ms-settings:network-wifi"));
         }
     }
 }
