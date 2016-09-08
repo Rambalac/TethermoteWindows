@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.ApplicationModel.Background;
+using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.Rfcomm;
 using Windows.Devices.Enumeration;
 using Windows.Devices.WiFi;
@@ -149,7 +150,7 @@ namespace TethermoteWindows
 
         public static async Task<IEnumerable<DeviceInfo>> GetDevices()
         {
-            var selector = RfcommDeviceService.GetDeviceSelector(RfcommServiceId.FromUuid(serviceUuid));
+            var selector = BluetoothDevice.GetDeviceSelector();
             //var selector = BluetoothDevice.GetDeviceSelectorFromPairingState(true);
             var devices = await DeviceInformation.FindAllAsync(selector);
             return devices.Select(d => new DeviceInfo { Name = d.Name, Device = d });

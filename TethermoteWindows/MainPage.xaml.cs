@@ -30,6 +30,22 @@ namespace TethermoteWindows
     {
         public string Name { get; set; }
         public DeviceInformation Device { get; set; }
+        // override object.Equals
+        public override bool Equals(object obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+            {
+                return false;
+            }
+
+            return Name == ((DeviceInfo)obj).Name;;
+        }
+
+        // override object.GetHashCode
+        public override int GetHashCode()
+        {
+            return Name.GetHashCode();
+        }
     }
 
     /// <summary>
@@ -64,7 +80,9 @@ namespace TethermoteWindows
 
         private async Task RefreshDevices()
         {
-            var devices = await App.GetDevices();
+            var devices = (await App.GetDevices()).OrderBy(s => s.Name).ToList();
+            if (comboBox.Items.Count == devices.Count&& comboBox.Items.ToList().OfType<DeviceInfo>().OrderBy(s=>s.Name).SequenceEqual(devices)) return;
+            comboBox.Items.Clear();
             foreach (var item in devices)
             {
                 comboBox.Items.Add(item);
@@ -78,7 +96,8 @@ namespace TethermoteWindows
             {
                 var newstate = await App.SwitchTethering(!(button.IsChecked ?? false));
                 button.IsChecked = newstate == TetheringState.Enabled;
-            } catch(Exception)
+            }
+            catch (Exception)
             {
                 button.IsChecked = false;
             }
