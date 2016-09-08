@@ -150,8 +150,7 @@ namespace TethermoteWindows
 
         public static async Task<IEnumerable<DeviceInfo>> GetDevices()
         {
-            var selector = BluetoothDevice.GetDeviceSelector();
-            //var selector = BluetoothDevice.GetDeviceSelectorFromPairingState(true);
+            var selector = BluetoothDevice.GetDeviceSelectorFromPairingState(true);
             var devices = await DeviceInformation.FindAllAsync(selector);
             return devices.Select(d => new DeviceInfo { Name = d.Name, Device = d });
         }
@@ -161,7 +160,7 @@ namespace TethermoteWindows
             if (AppSettings.RemoteDevice == null) return TetheringState.Error;
             var device = (await GetDevices()).SingleOrDefault(d => d.Name == AppSettings.RemoteDevice);
             if (device == null) return TetheringState.Error;
-            var result = await SendBluetooth(device.Device, (byte)state);
+            var result = await SendBluetooth(device.Device, state);
 
             return result;
         }
@@ -237,29 +236,64 @@ namespace TethermoteWindows
             await s.UpdateAsync();
         }
 
-        public static async Task<TetheringState> SendBluetooth(DeviceInformation dev, byte state)
+        public static async Task<StreamSocket> ConnectDevice(DeviceInformation dev)
         {
-            for (var tryout = 3; tryout > 0; tryout--)
+            var service = await RfcommDeviceService.FromIdAsync(dev.Id);
+            var socket = new StreamSocket();
+            await socket.ConnectAsync(service.ConnectionHostName, service.ConnectionServiceName, SocketProtectionLevel.BluetoothEncryptionWithAuthentication);
+            return socket;
+        }
+
+        public static async Task PingDevice(string id)
+        {
+            var bl = await BluetoothDevice.FromIdAsync(id);
+            var service = bl.RfcommServices.FirstOrDefault();
+            if (service == null) return;
+
+            using (var socket = new StreamSocket())
+            {
+                await socket.ConnectAsync(service.ConnectionHostName, service.ConnectionServiceName, SocketProtectionLevel.BluetoothEncryptionWithAuthentication);
+            }
+        }
+
+        public static async Task<TetheringState> SendBluetooth(DeviceInformation dev, TetheringState state)
+        {
+            for (var tryout = 10; tryout > 0; tryout--)
             {
                 try
                 {
-                    var service = await RfcommDeviceService.FromIdAsync(dev.Id);
-                    var socket = new StreamSocket();
-                    await socket.ConnectAsync(service.ConnectionHostName, service.ConnectionServiceName, SocketProtectionLevel.BluetoothEncryptionWithAuthentication);
-                    using (var outstream = socket.OutputStream.AsStreamForWrite())
+                    string selector = RfcommDeviceService.GetDeviceSelector(RfcommServiceId.FromUuid(serviceUuid));
+                    var devices = await DeviceInformation.FindAllAsync(selector);
+                    var service = devices.SingleOrDefault(d => d.Id.StartsWith(dev.Id));
+                    if (service == null) throw new Exception("Tethermote Service not found");
+
+                    using (var socket = await ConnectDevice(service))
                     {
-                        await outstream.WriteAsync(new byte[] { state }, 0, 1);
+                        using (var outstream = socket.OutputStream.AsStreamForWrite())
+                        {
+                            await outstream.WriteAsync(new byte[] { (byte)state }, 0, 1);
+                        }
+                        using (var instream = socket.InputStream.AsStreamForRead())
+                        {
+                            var buf = new byte[1];
+                            int red = await instream.ReadAsync(buf, 0, 1);
+                            if (red == 1) return (TetheringState)buf[0];
+                            Debug.WriteLine("No data");
+                        }
                     }
-                    using (var instream = socket.InputStream.AsStreamForRead())
-                    {
-                        var buf = new byte[1];
-                        int red = await instream.ReadAsync(buf, 0, 1);
-                        if (red == 1) return (TetheringState)buf[0];
-                        Debug.WriteLine("No data");
-                    }
-                }catch(Exception ex)
+                }
+                catch (Exception ex)
                 {
                     Debug.WriteLine(ex);
+                    try
+                    {
+                        await PingDevice(dev.Id);
+                    }
+                    catch (Exception e2)
+                    {
+                        Debug.WriteLine(e2);
+                    }
+                    if (tryout != 1) await Task.Delay(100);
                 }
             }
             return TetheringState.Error;

@@ -90,17 +90,24 @@ namespace TethermoteWindows
             }
         }
 
+        bool connected = false;
+
         private async void switchButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                var newstate = await App.SwitchTethering(!(button.IsChecked ?? false));
-                button.IsChecked = newstate == TetheringState.Enabled;
+                var newstate = await App.SwitchTethering(!(connected));
+                connected = newstate == TetheringState.Enabled;
             }
             catch (Exception)
             {
-                button.IsChecked = false;
             }
+            UpdateButton();
+        }
+
+        private void UpdateButton()
+        {
+            button.Content = (connected) ? "Tap to Disconnect" : "Tap to Connect";
         }
 
         private bool SwitchTileButtonEnabled => !SecondaryTile.Exists(App.SwitchTileId);
@@ -131,6 +138,19 @@ namespace TethermoteWindows
         private async void openWifiSettings_Click(object sender, RoutedEventArgs e)
         {
             await Launcher.LaunchUriAsync(new Uri("ms-settings:network-wifi"));
+        }
+
+        private async void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var newstate = await App.SendBluetooth(TetheringState.GetState);
+                connected = newstate == TetheringState.Enabled;
+            }
+            catch (Exception)
+            {
+            }
+            UpdateButton();
         }
     }
 }
