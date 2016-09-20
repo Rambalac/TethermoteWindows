@@ -26,7 +26,7 @@ using Windows.UI.Xaml.Navigation;
 
 namespace TethermoteWindows
 {
-    public class DeviceInfo
+    sealed public class DeviceInfo
     {
         public string Name { get; set; }
         public DeviceInformation Device { get; set; }

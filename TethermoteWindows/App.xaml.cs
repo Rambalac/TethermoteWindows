@@ -264,7 +264,7 @@ namespace TethermoteWindows
                 {
                     string selector = RfcommDeviceService.GetDeviceSelector(RfcommServiceId.FromUuid(serviceUuid));
                     var devices = await DeviceInformation.FindAllAsync(selector);
-                    var service = devices.SingleOrDefault(d => d.Id.StartsWith(dev.Id));
+                    var service = devices.SingleOrDefault(d => d.Id.StartsWith(dev.Id, StringComparison.OrdinalIgnoreCase));
                     if (service == null) throw new Exception("Tethermote Service not found");
 
                     using (var socket = await ConnectDevice(service))
