@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using Windows.Foundation.Collections;
 using Windows.Storage;
 
-namespace TethermoteWindows
+namespace Azi.TethermoteBase
 {
-    public sealed static class AppSettings
+    public static class AppSettings
     {
         private static IPropertySet Values => ApplicationData.Current.LocalSettings.Values;
 

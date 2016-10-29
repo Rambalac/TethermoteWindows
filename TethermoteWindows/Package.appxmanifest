@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
-  <Identity Name="1d1d39aa-4756-4f7a-a2ff-9c1ea5a543c8" Publisher="CN=Rambalac" Version="1.0.0.0" />
+  <Identity Name="51338Rambalac.Tethermote" Publisher="CN=92765C0E-C69D-491B-9315-91859F5319B9" Version="1.1.1.0" />
   <mp:PhoneIdentity PhoneProductId="1d1d39aa-4756-4f7a-a2ff-9c1ea5a543c8" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>Tethermote</DisplayName>
@@ -15,11 +15,23 @@
   </Resources>
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="TethermoteWindows.App">
-      <uap:VisualElements DisplayName="Tethermote Settings" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" Description="Switch WiFi tethering remotly on Android devices with same app installed ." BackgroundColor="transparent">
+      <uap:VisualElements DisplayName="Tethermote Settings" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" Description="Switch WiFi tethering remotly on Android devices with same app installed." BackgroundColor="transparent">
         <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png">
         </uap:DefaultTile>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
+      <Extensions>
+        <Extension Category="windows.backgroundTasks" EntryPoint="Azi.TethermoteBase.UserPresentBackgroundTask">
+          <BackgroundTasks>
+            <Task Type="systemEvent" />
+          </BackgroundTasks>
+        </Extension>
+        <Extension Category="windows.backgroundTasks" EntryPoint="Azi.TethermoteBase.UserNotPresentBackgroundTask">
+          <BackgroundTasks>
+            <Task Type="systemEvent" />
+          </BackgroundTasks>
+        </Extension>
+      </Extensions>
     </Application>
   </Applications>
   <Capabilities>

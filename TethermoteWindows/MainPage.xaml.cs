@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Azi.TethermoteBase;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -22,31 +23,9 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-// The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
-
-namespace TethermoteWindows
+namespace Azi.TethermoteWindows
 {
-    sealed public class DeviceInfo
-    {
-        public string Name { get; set; }
-        public DeviceInformation Device { get; set; }
-        // override object.Equals
-        public override bool Equals(object obj)
-        {
-            if (obj == null || GetType() != obj.GetType())
-            {
-                return false;
-            }
-
-            return Name == ((DeviceInfo)obj).Name;;
-        }
-
-        // override object.GetHashCode
-        public override int GetHashCode()
-        {
-            return Name.GetHashCode();
-        }
-    }
+    
 
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
@@ -80,8 +59,9 @@ namespace TethermoteWindows
 
         private async Task RefreshDevices()
         {
-            var devices = (await App.GetDevices()).OrderBy(s => s.Name).ToList();
-            if (comboBox.Items.Count == devices.Count&& comboBox.Items.ToList().OfType<DeviceInfo>().OrderBy(s=>s.Name).SequenceEqual(devices)) return;
+            var devices = (await Bluetooth.GetDevices()).OrderBy(s => s.Name).ToList();
+            var items = comboBox.Items.ToList().OfType<DeviceInfo>().OrderBy(s => s.Name).ToList();
+            if (items.Count == devices.Count && items.SequenceEqual(devices)) return;
             comboBox.Items.Clear();
             foreach (var item in devices)
             {
@@ -96,7 +76,7 @@ namespace TethermoteWindows
         {
             try
             {
-                var newstate = await App.SwitchTethering(!(connected));
+                var newstate = await Bluetooth.SwitchTethering(!(connected));
                 connected = newstate == TetheringState.Enabled;
             }
             catch (Exception)
@@ -116,7 +96,7 @@ namespace TethermoteWindows
         {
             try
             {
-                var enabled = await App.SendBluetooth(TetheringState.GetState) == TetheringState.Enabled;
+                var enabled = await Bluetooth.SendBluetooth(TetheringState.GetState) == TetheringState.Enabled;
                 await App.AddSwitchTile((FrameworkElement)sender, enabled);
             }
             catch (Exception)
@@ -144,7 +124,7 @@ namespace TethermoteWindows
         {
             try
             {
-                var newstate = await App.SendBluetooth(TetheringState.GetState);
+                var newstate = await Bluetooth.SendBluetooth(TetheringState.GetState);
                 connected = newstate == TetheringState.Enabled;
             }
             catch (Exception)

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Azi.TethermoteBase;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -25,7 +26,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-namespace TethermoteWindows
+namespace Azi.TethermoteWindows
 {
     /// <summary>
     /// Provides application-specific behavior to supplement the default Application class.
@@ -55,6 +56,7 @@ namespace TethermoteWindows
 #if DEBUG
             this.DebugSettings.EnableFrameRateCounter |= System.Diagnostics.Debugger.IsAttached;
 #endif
+            await RegisterBackgroundTasks();
 
             var rootFrame = Window.Current.Content as Frame;
 
@@ -95,15 +97,41 @@ namespace TethermoteWindows
             }
         }
 
+        private async Task RegisterBackgroundTasks()
+        {
+            await BackgroundExecutionManager.RequestAccessAsync();
+            RegisterBackgroundTask<UserPresentBackgroundTask>("UserPresent", new SystemTrigger(SystemTriggerType.UserPresent, false));
+            RegisterBackgroundTask<UserNotPresentBackgroundTask>("UserNotPresent", new SystemTrigger(SystemTriggerType.UserAway, false));
+        }
+
+        private void RegisterBackgroundTask<T>(string taskName, IBackgroundTrigger trigger)
+        {
+            // check if task is already registered
+            foreach (var cur in BackgroundTaskRegistration.AllTasks)
+                if (cur.Value.Name == taskName)
+                {
+                    return;
+                }
+
+            // register a new task
+            var taskBuilder = new BackgroundTaskBuilder
+            {
+                Name = taskName,
+                TaskEntryPoint = typeof(T).FullName,
+            };
+            taskBuilder.SetTrigger(trigger);
+            var myFirstTask = taskBuilder.Register();
+        }
+
         private async Task TileClicked(bool enable)
         {
             try
             {
-                var state = await SwitchTethering(enable);
+                var state = await Bluetooth.SwitchTethering(enable);
                 await UpdateTile(state);
                 if (state == TetheringState.Enabled)
                 {
-                    await WaitForWiFiConnection();
+                    await WiFi.WaitForWiFiConnection();
                 }
                 else
                     if (state == TetheringState.Error)
@@ -122,47 +150,6 @@ namespace TethermoteWindows
         {
             var dialog = new MessageDialog("Device can be too far for Bluetooth or its Bluetooth is disabled or device is turned off.\r\nIf device is near by but still does not work try to run Tethermote Settings on that device again.");
             await dialog.ShowAsync();
-        }
-
-        private async Task WaitForWiFiConnection()
-        {
-            var accessAllowed = await WiFiAdapter.RequestAccessAsync();
-            if (accessAllowed == WiFiAccessStatus.Allowed)
-            {
-                var adapterList = await DeviceInformation.FindAllAsync(WiFiAdapter.GetDeviceSelector());
-                var wifiAdapter = await WiFiAdapter.FromIdAsync(adapterList[0].Id);
-
-                for (int i = 0; i < 5; i++)
-                {
-                    await wifiAdapter.ScanAsync();
-                    await Task.Delay(100);
-                    if ((await wifiAdapter.NetworkAdapter.GetConnectedProfileAsync()) != null) break;
-                }
-            }
-        }
-
-        public static async Task<TetheringState> SwitchTethering(bool v)
-        {
-            return await SendBluetooth(v ? TetheringState.Enabled : TetheringState.Disabled);
-        }
-
-        private static readonly Guid serviceUuid = new Guid("5dc6ece2-3e0d-4425-ac00-e444be6b56cb");
-
-        public static async Task<IEnumerable<DeviceInfo>> GetDevices()
-        {
-            var selector = BluetoothDevice.GetDeviceSelectorFromPairingState(true);
-            var devices = await DeviceInformation.FindAllAsync(selector);
-            return devices.Select(d => new DeviceInfo { Name = d.Name, Device = d });
-        }
-
-        public static async Task<TetheringState> SendBluetooth(TetheringState state)
-        {
-            if (AppSettings.RemoteDevice == null) return TetheringState.Error;
-            var device = (await GetDevices()).SingleOrDefault(d => d.Name == AppSettings.RemoteDevice);
-            if (device == null) return TetheringState.Error;
-            var result = await SendBluetooth(device.Device, state);
-
-            return result;
         }
 
         /// <summary>
@@ -206,97 +193,34 @@ namespace TethermoteWindows
 
         public static async Task AddSwitchTile(FrameworkElement sender, bool enabled)
         {
-            var logo = enabled ? logoOn : logoOff;
+            var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
 
+            var logo = enabled ? logoOn : logoOff;
+            var deviceName = AppSettings.RemoteDevice;
+            var tileText = string.Format(loader.GetString((enabled) ? "Tile_Tooltip_ToDisable" : "Tile_Tooltip_ToEnable"), deviceName);
             var s = new SecondaryTile(SwitchTileId,
-                                                                "Title text shown on the tile",
-                                                                "Name of the tile the user sees when searching for the tile",
-                                                                (!enabled) ? EnableSwitchArgument : DisableSwitchArgument,
-                                                                TileOptions.None,
-                                                                logo);
+                            tileText,
+                            (!enabled) ? EnableSwitchArgument : DisableSwitchArgument,
+                            logo, TileSize.Square150x150);
 
             // Specify a foreground text value.
-            s.ForegroundText = ForegroundText.Dark;
-            await s.RequestCreateForSelectionAsync(GetElementRect(sender), Windows.UI.Popups.Placement.Below);
+            await s.RequestCreateForSelectionAsync(GetElementRect(sender), Placement.Below);
         }
 
         private async Task UpdateTile(TetheringState state)
         {
+            var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
+
             var enabled = state == TetheringState.Enabled;
             var logo = enabled ? logoOn : logoOff;
-
+            var deviceName = AppSettings.RemoteDevice;
+            var tileText = string.Format(loader.GetString((enabled) ? "Tile_Tooltip_ToDisable" : "Tile_Tooltip_ToEnable"), deviceName);
             var s = new SecondaryTile(SwitchTileId,
-                                                                "Title text shown on the tile",
-                                                                "Name of the tile the user sees when searching for the tile",
-                                                                (!enabled) ? EnableSwitchArgument : DisableSwitchArgument,
-                                                                TileOptions.None,
-                                                                logo);
+                                tileText,
+                                (!enabled) ? EnableSwitchArgument : DisableSwitchArgument,
+                                logo, TileSize.Square150x150);
             // Specify a foreground text value.
-            s.ForegroundText = ForegroundText.Dark;
             await s.UpdateAsync();
-        }
-
-        public static async Task<StreamSocket> ConnectDevice(DeviceInformation dev)
-        {
-            var service = await RfcommDeviceService.FromIdAsync(dev.Id);
-            var socket = new StreamSocket();
-            await socket.ConnectAsync(service.ConnectionHostName, service.ConnectionServiceName, SocketProtectionLevel.BluetoothEncryptionWithAuthentication);
-            return socket;
-        }
-
-        public static async Task PingDevice(string id)
-        {
-            var bl = await BluetoothDevice.FromIdAsync(id);
-            var service = bl.RfcommServices.FirstOrDefault();
-            if (service == null) return;
-
-            using (var socket = new StreamSocket())
-            {
-                await socket.ConnectAsync(service.ConnectionHostName, service.ConnectionServiceName, SocketProtectionLevel.BluetoothEncryptionWithAuthentication);
-            }
-        }
-
-        public static async Task<TetheringState> SendBluetooth(DeviceInformation dev, TetheringState state)
-        {
-            for (var tryout = 10; tryout > 0; tryout--)
-            {
-                try
-                {
-                    string selector = RfcommDeviceService.GetDeviceSelector(RfcommServiceId.FromUuid(serviceUuid));
-                    var devices = await DeviceInformation.FindAllAsync(selector);
-                    var service = devices.SingleOrDefault(d => d.Id.StartsWith(dev.Id, StringComparison.OrdinalIgnoreCase));
-                    if (service == null) throw new Exception("Tethermote Service not found");
-
-                    using (var socket = await ConnectDevice(service))
-                    {
-                        using (var outstream = socket.OutputStream.AsStreamForWrite())
-                        {
-                            await outstream.WriteAsync(new byte[] { (byte)state }, 0, 1);
-                        }
-                        using (var instream = socket.InputStream.AsStreamForRead())
-                        {
-                            var buf = new byte[1];
-                            int red = await instream.ReadAsync(buf, 0, 1);
-                            if (red == 1) return (TetheringState)buf[0];
-                            Debug.WriteLine("No data");
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex);
-                    try
-                    {
-                        await PingDevice(dev.Id);
-                    }
-                    catch (Exception e2)
-                    {
-                        Debug.WriteLine(e2);
-                    }
-                    if (tryout != 1) await Task.Delay(100);
-                }
-            }
-            return TetheringState.Error;
         }
     }
 }
