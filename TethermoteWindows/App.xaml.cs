@@ -1,29 +1,14 @@
 ﻿using Azi.TethermoteBase;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.ApplicationModel.Background;
-using Windows.Devices.Bluetooth;
-using Windows.Devices.Bluetooth.Rfcomm;
-using Windows.Devices.Enumeration;
-using Windows.Devices.WiFi;
 using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.Networking.Sockets;
 using Windows.UI.Popups;
 using Windows.UI.StartScreen;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 namespace Azi.TethermoteWindows
@@ -148,7 +133,8 @@ namespace Azi.TethermoteWindows
 
         static public async Task ShowError()
         {
-            var dialog = new MessageDialog("Device can be too far for Bluetooth or its Bluetooth is disabled or device is turned off.\r\nIf device is near by but still does not work try to run Tethermote Settings on that device again.");
+            var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
+            var dialog = new MessageDialog(loader.GetString("Message_BluetoothError"));
             await dialog.ShowAsync();
         }
 

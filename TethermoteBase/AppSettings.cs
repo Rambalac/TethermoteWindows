@@ -22,12 +22,12 @@ namespace Azi.TethermoteBase
         }
         public static bool DisableOnUserNotPresent
         {
-            get { return (bool)Values[GetCallerName()]; }
+            get { return (bool)(Values[GetCallerName()] ?? false); }
             set { Values[GetCallerName()] = value; }
         }
         public static bool EnableOnUserPresent
         {
-            get { return (bool)Values[GetCallerName()]; }
+            get { return (bool)(Values[GetCallerName()] ?? false); }
             set { Values[GetCallerName()] = value; }
         }
     }

@@ -117,16 +117,34 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Main_AddTile.Content" xml:space="preserve">
+    <value>Add switch tile to Start Menu</value>
+  </data>
+  <data name="Main_Devices.Header" xml:space="preserve">
+    <value>Remote device name</value>
+  </data>
+  <data name="Main_DisableOnAway.Content" xml:space="preserve">
+    <value>Disable tethering when user is away (Not reliable)</value>
+  </data>
+  <data name="Main_EnableOnPresent.Content" xml:space="preserve">
+    <value>Enable tethering when user is present (Not reliable)</value>
+  </data>
+  <data name="Main_OpenDevices.Content" xml:space="preserve">
+    <value>Open Devices Settings</value>
+  </data>
   <data name="Main_TapToSwitch.Content" xml:space="preserve">
     <value>Tap to Switch</value>
   </data>
-  <data name="Tile.Text" xml:space="preserve">
-    <value>Swith WiFi Tethering on your device {0}</value>
+  <data name="Man_OpenWiFi.Content" xml:space="preserve">
+    <value>Open WiFi Settings</value>
+  </data>
+  <data name="Message_BluetoothError" xml:space="preserve">
+    <value>Device can be too far for Bluetooth or its Bluetooth is disabled or device is turned off.\r\nIf device is near by but still does not work try to run Tethermote Settings on that device again.\r\nIf your device is Samsung or HTC exclude Tethermote from poversaving </value>
   </data>
   <data name="Tile_Tooltip_ToDisable" xml:space="preserve">
-    <value>Disable WiFi Tethering on your device {0}</value>
+    <value>Disable WiFi tethering on your device {0}</value>
   </data>
   <data name="Tile_Tooltip_ToEnable" xml:space="preserve">
-    <value>Enable WiFi Tethering on your device {0}</value>
+    <value>Enable WiFi tethering on your device {0}</value>
   </data>
 </root>
