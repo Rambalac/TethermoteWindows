@@ -26,7 +26,7 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Button x:Name="button" x:Uid="Main_TapToSwitch" HorizontalAlignment="Stretch" Margin="10,10,10,5" FontSize="40" ClickMode="Press" Click="switchButton_Click" />
-        <ComboBox x:Uid="Main_Devices" x:Name="comboBox" Grid.Row="2" HorizontalAlignment="Stretch" Margin="10,0,10,0" Loaded="comboBox_Loaded" SelectionChanged="comboBox_SelectionChanged">
+        <ComboBox x:Uid="Main_Devices" x:Name="comboBox" Grid.Row="2" HorizontalAlignment="Stretch" Margin="10,0,10,0" Loaded="comboBox_Loaded" SelectionChanged="comboBox_SelectionChanged" DropDownClosed="comboBox_DropDownClosed">
             <ComboBox.ItemTemplate>
                 <DataTemplate x:DataType="base:DeviceInfo">
                     <TextBlock Text="{x:Bind Name}"/>

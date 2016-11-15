@@ -132,14 +132,22 @@
   <data name="Main_OpenDevices.Content" xml:space="preserve">
     <value>Open Devices Settings</value>
   </data>
+  <data name="Main_OpenWiFi.Content" xml:space="preserve">
+    <value>Open WiFi Settings</value>
+  </data>
   <data name="Main_TapToSwitch.Content" xml:space="preserve">
     <value>Tap to Switch</value>
   </data>
-  <data name="Man_OpenWiFi.Content" xml:space="preserve">
-    <value>Open WiFi Settings</value>
-  </data>
   <data name="Message_BluetoothError" xml:space="preserve">
-    <value>Device can be too far for Bluetooth or its Bluetooth is disabled or device is turned off.\r\nIf device is near by but still does not work try to run Tethermote Settings on that device again.\r\nIf your device is Samsung or HTC exclude Tethermote from poversaving </value>
+    <value>Device can be too far for Bluetooth or its Bluetooth is disabled or device is turned off.
+If device is near by but still does not work try to run Tethermote Settings on that device again.
+If your device is Samsung or HTC exclude Tethermote from poversaving </value>
+  </data>
+  <data name="Message_Manual" xml:space="preserve">
+    <value>You need to select your Android device in the dropdown list.
+If you have no devices or no devices with tetherings feature in the list please open this device Devices Settings and Pair other device via Bluetooth.
+For now only Android devices with installed Tethermote app are supported.
+Because of MS Store policy there is no way to mention about Android in this app description.</value>
   </data>
   <data name="Tile_Tooltip_ToDisable" xml:space="preserve">
     <value>Disable WiFi tethering on your device {0}</value>

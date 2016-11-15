@@ -113,7 +113,10 @@
     <Compile Include="DeviceInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TetheringStates.cs" />
-    <Compile Include="UserPresentsBackgroundTask.cs" />
+    <Compile Include="Tile.cs" />
+    <Compile Include="TileUpdateBackgroundTask.cs" />
+    <Compile Include="UserNotPresentBackgroundTask.cs" />
+    <Compile Include="UserPresentBackgroundTask.cs" />
     <Compile Include="WiFi.cs" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">

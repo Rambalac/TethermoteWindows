@@ -56,7 +56,7 @@ namespace Azi.TethermoteBase
             });
         }
 
-        public static IAsyncAction PingDevice(string id)
+        private static IAsyncAction PingDevice(string id)
         {
             return AsyncInfo.Run(async (cancel) =>
             {

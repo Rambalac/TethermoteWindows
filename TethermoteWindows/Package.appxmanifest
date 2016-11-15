@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
-  <Identity Name="51338Rambalac.Tethermote" Publisher="CN=92765C0E-C69D-491B-9315-91859F5319B9" Version="1.1.1.0" />
+  <Identity Name="51338Rambalac.Tethermote" Publisher="CN=92765C0E-C69D-491B-9315-91859F5319B9" Version="1.1.2.0" />
   <mp:PhoneIdentity PhoneProductId="1d1d39aa-4756-4f7a-a2ff-9c1ea5a543c8" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>Tethermote</DisplayName>
@@ -21,12 +21,18 @@
         <uap:SplashScreen Image="assets\SplashScreen\SplashScreen.png" />
       </uap:VisualElements>
       <Extensions>
-        <Extension Category="windows.backgroundTasks" EntryPoint="Azi.TethermoteBase.UserPresentBackgroundTask">
+        <Extension Category="windows.backgroundTasks" EntryPoint="Azi.TethermoteBase.TileUpdateBackgroundTask">
+          <BackgroundTasks>
+            <Task Type="systemEvent" />
+            <Task Type="timer" />
+          </BackgroundTasks>
+        </Extension>
+        <Extension Category="windows.backgroundTasks" EntryPoint="Azi.TethermoteBase.UserNotPresentBackgroundTask">
           <BackgroundTasks>
             <Task Type="systemEvent" />
           </BackgroundTasks>
         </Extension>
-        <Extension Category="windows.backgroundTasks" EntryPoint="Azi.TethermoteBase.UserNotPresentBackgroundTask">
+        <Extension Category="windows.backgroundTasks" EntryPoint="Azi.TethermoteBase.UserPresentBackgroundTask">
           <BackgroundTasks>
             <Task Type="systemEvent" />
           </BackgroundTasks>

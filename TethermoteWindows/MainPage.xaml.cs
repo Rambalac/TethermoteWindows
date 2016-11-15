@@ -14,6 +14,7 @@ using Windows.Foundation.Collections;
 using Windows.Networking.Sockets;
 using Windows.Storage.Streams;
 using Windows.System;
+using Windows.UI.Popups;
 using Windows.UI.StartScreen;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -25,7 +26,7 @@ using Windows.UI.Xaml.Navigation;
 
 namespace Azi.TethermoteWindows
 {
-    
+
 
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
@@ -50,6 +51,11 @@ namespace Azi.TethermoteWindows
 
             timer.Tick += Timer_Tick; ;
             timer.Start();
+
+            if (comboBox.SelectedItem == null)
+            {
+                await ShowManual();
+            }
         }
 
         private async void Timer_Tick(object sender, object e)
@@ -90,19 +96,26 @@ namespace Azi.TethermoteWindows
             button.Content = (connected) ? "Tap to Disconnect" : "Tap to Connect";
         }
 
-        private bool SwitchTileButtonEnabled => !SecondaryTile.Exists(App.SwitchTileId);
+        private bool SwitchTileButtonEnabled => !Tile.Exists;
 
         private async void AddSwitchTileButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 var enabled = await Bluetooth.SendBluetooth(TetheringState.GetState) == TetheringState.Enabled;
-                await App.AddSwitchTile((FrameworkElement)sender, enabled);
+                await Tile.AddSwitchTile((FrameworkElement)sender, enabled);
             }
             catch (Exception)
             {
-                await App.AddSwitchTile((FrameworkElement)sender, false);
+                await Tile.AddSwitchTile((FrameworkElement)sender, false);
             }
+        }
+
+        static public async Task ShowManual()
+        {
+            var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
+            var dialog = new MessageDialog(loader.GetString("Message_Manual"));
+            await dialog.ShowAsync();
         }
 
         private void comboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -131,6 +144,14 @@ namespace Azi.TethermoteWindows
             {
             }
             UpdateButton();
+        }
+
+        private async void comboBox_DropDownClosed(object sender, object e)
+        {
+            if (comboBox.SelectedItem == null)
+            {
+                await ShowManual();
+            }
         }
     }
 }

@@ -86,7 +86,10 @@ namespace Azi.TethermoteWindows
         {
             await BackgroundExecutionManager.RequestAccessAsync();
             RegisterBackgroundTask<UserPresentBackgroundTask>("UserPresent", new SystemTrigger(SystemTriggerType.UserPresent, false));
+            RegisterBackgroundTask<UserPresentBackgroundTask>("SessionUserPresent", new SystemTrigger(SystemTriggerType.SessionConnected, false));
             RegisterBackgroundTask<UserNotPresentBackgroundTask>("UserNotPresent", new SystemTrigger(SystemTriggerType.UserAway, false));
+            RegisterBackgroundTask<TileUpdateBackgroundTask>("TileUpdate", new TimeTrigger(30, false));
+            RegisterBackgroundTask<TileUpdateBackgroundTask>("NetworkTileUpdate", new SystemTrigger(SystemTriggerType.NetworkStateChange, false));
         }
 
         private void RegisterBackgroundTask<T>(string taskName, IBackgroundTrigger trigger)
@@ -107,13 +110,15 @@ namespace Azi.TethermoteWindows
             taskBuilder.SetTrigger(trigger);
             var myFirstTask = taskBuilder.Register();
         }
+        private const string EnableSwitchArgument = "enable";
+        private const string DisableSwitchArgument = "disable";
 
         private async Task TileClicked(bool enable)
         {
             try
             {
                 var state = await Bluetooth.SwitchTethering(enable);
-                await UpdateTile(state);
+                await Tile.UpdateTile(state);
                 if (state == TetheringState.Enabled)
                 {
                     await WiFi.WaitForWiFiConnection();
@@ -160,53 +165,6 @@ namespace Azi.TethermoteWindows
             var deferral = e.SuspendingOperation.GetDeferral();
             //TODO: Save application state and stop any background activity
             deferral.Complete();
-        }
-
-        const string EnableSwitchArgument = "enable";
-        const string DisableSwitchArgument = "disable";
-
-        public const string SwitchTileId = "SwitchTile";
-
-        private static Rect GetElementRect(FrameworkElement _element)
-        {
-            var rectangleBounds = new Rect();
-            rectangleBounds = _element.RenderTransform.TransformBounds(new Rect(0, 0, _element.Width, _element.Height));
-            return rectangleBounds;
-        }
-
-        private static readonly Uri logoOn = new Uri("ms-appx:///Assets/widget_on.png");
-        private static readonly Uri logoOff = new Uri("ms-appx:///Assets/widget_off.png");
-
-        public static async Task AddSwitchTile(FrameworkElement sender, bool enabled)
-        {
-            var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
-
-            var logo = enabled ? logoOn : logoOff;
-            var deviceName = AppSettings.RemoteDevice;
-            var tileText = string.Format(loader.GetString((enabled) ? "Tile_Tooltip_ToDisable" : "Tile_Tooltip_ToEnable"), deviceName);
-            var s = new SecondaryTile(SwitchTileId,
-                            tileText,
-                            (!enabled) ? EnableSwitchArgument : DisableSwitchArgument,
-                            logo, TileSize.Square150x150);
-
-            // Specify a foreground text value.
-            await s.RequestCreateForSelectionAsync(GetElementRect(sender), Placement.Below);
-        }
-
-        private async Task UpdateTile(TetheringState state)
-        {
-            var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
-
-            var enabled = state == TetheringState.Enabled;
-            var logo = enabled ? logoOn : logoOff;
-            var deviceName = AppSettings.RemoteDevice;
-            var tileText = string.Format(loader.GetString((enabled) ? "Tile_Tooltip_ToDisable" : "Tile_Tooltip_ToEnable"), deviceName);
-            var s = new SecondaryTile(SwitchTileId,
-                                tileText,
-                                (!enabled) ? EnableSwitchArgument : DisableSwitchArgument,
-                                logo, TileSize.Square150x150);
-            // Specify a foreground text value.
-            await s.UpdateAsync();
         }
     }
 }
