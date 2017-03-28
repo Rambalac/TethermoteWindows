@@ -9,6 +9,7 @@ using Windows.ApplicationModel.Background;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.Rfcomm;
 using Windows.Devices.Enumeration;
+using Windows.Devices.Radios;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Networking.Sockets;
@@ -40,7 +41,7 @@ namespace Azi.TethermoteWindows
             InitializeComponent();
         }
 
-        private async void comboBox_Loaded(object sender, RoutedEventArgs e)
+        private async void ComboBox_Loaded(object sender, RoutedEventArgs e)
         {
             DevicesComboBox?.Items?.Clear();
             await RefreshDevices();
@@ -78,15 +79,17 @@ namespace Azi.TethermoteWindows
 
         bool connected = false;
 
-        private async void switchButton_Click(object sender, RoutedEventArgs e)
+        private async void SwitchButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                var newstate = await Bluetooth.SwitchTethering(!(connected));
+                var newstate = await App.SwitchTethering(!(connected));
+                
                 connected = newstate == TetheringState.Enabled;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                
             }
             UpdateButton();
         }
@@ -137,6 +140,8 @@ namespace Azi.TethermoteWindows
         {
             try
             {
+                var result = await Radio.RequestAccessAsync();
+
                 var newstate = await Bluetooth.SendBluetooth(TetheringState.GetState);
                 connected = newstate == TetheringState.Enabled;
             }

@@ -59,7 +59,15 @@ namespace Azi.TethermoteBase
                                 (!enabled) ? EnableSwitchArgument : DisableSwitchArgument,
                                 logo, TileSize.Square150x150);
             // Specify a foreground text value.
-            return AsyncInfo.Run(async (cancel) => { await s.UpdateAsync(); });
+            return AsyncInfo.Run(async (cancel) => {
+                try
+                {
+                    await s.UpdateAsync();
+                }catch(Exception)
+                {
+                    // Ignore
+                }
+            });
         }
 
     }

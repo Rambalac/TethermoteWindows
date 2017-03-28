@@ -42,5 +42,6 @@
   </Applications>
   <Capabilities>
     <DeviceCapability Name="bluetooth" />
+    <DeviceCapability Name="radios" />
   </Capabilities>
 </Package>

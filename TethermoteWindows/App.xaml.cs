@@ -114,26 +114,32 @@ namespace Azi.TethermoteWindows
         {
             try
             {
-                var state = await Bluetooth.SwitchTethering(enable);
-                await Tile.UpdateTile(state);
-                switch (state)
-                {
-                    case TetheringState.Enabled:
-                        await WiFi.WaitForWiFiConnection();
-                        break;
-                    case TetheringState.Error:
-                        await ShowError();
-                        break;
-                    case TetheringState.NoBluetooth:
-                        await ShowBluetoothError();
-                        break;
-                }
+                await SwitchTethering(enable);
             }
             catch (Exception)
             {
                 await ShowError();
             }
             Exit();
+        }
+
+        public static async Task<TetheringState> SwitchTethering(bool enable)
+        {
+            var state = await Bluetooth.SwitchTethering(enable);
+            await Tile.UpdateTile(state);
+            switch (state)
+            {
+                case TetheringState.Enabled:
+                    await WiFi.WaitForWiFiConnection();
+                    break;
+                case TetheringState.Error:
+                    await ShowError();
+                    break;
+                case TetheringState.NoBluetooth:
+                    await ShowBluetoothError();
+                    break;
+            }
+            return state;
         }
 
         public static async Task ShowError()
