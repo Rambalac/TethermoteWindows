@@ -7,4 +7,5 @@ Unfortunately Universal Windows Application API does not provide any way to swit
 MS Store link https://www.microsoft.com/store/apps/9NBLGGH4WFDC
 
 Google Play store link https://play.google.com/store/apps/details?id=com.azi.tethermote
+
 Android Tethermote repository https://github.com/Rambalac/Tethermote
