@@ -96,7 +96,7 @@ namespace Azi.TethermoteWindows
 
         private void UpdateButton()
         {
-            button.Content = (connected) ? "Tap to Disconnect" : "Tap to Connect";
+            SwitchButton.Content = (connected) ? "Tap to Disconnect" : "Tap to Connect";
         }
 
         private bool SwitchTileButtonEnabled => !Tile.Exists;
@@ -121,17 +121,17 @@ namespace Azi.TethermoteWindows
             await dialog.ShowAsync();
         }
 
-        private void comboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             AppSettings.RemoteDevice = ((DeviceInfo)DevicesComboBox.SelectedItem)?.Name;
         }
 
-        private async void openDevicesSettings_Click(object sender, RoutedEventArgs e)
+        private async void OpenDevicesSettings_Click(object sender, RoutedEventArgs e)
         {
             await Launcher.LaunchUriAsync(new Uri("ms-settings:bluetooth"));
         }
 
-        private async void openWifiSettings_Click(object sender, RoutedEventArgs e)
+        private async void OpenWifiSettings_Click(object sender, RoutedEventArgs e)
         {
             await Launcher.LaunchUriAsync(new Uri("ms-settings:network-wifi"));
         }
@@ -151,7 +151,7 @@ namespace Azi.TethermoteWindows
             UpdateButton();
         }
 
-        private async void comboBox_DropDownClosed(object sender, object e)
+        private async void ComboBox_DropDownClosed(object sender, object e)
         {
             if (DevicesComboBox.SelectedItem == null)
             {
