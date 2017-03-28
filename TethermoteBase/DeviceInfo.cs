@@ -2,7 +2,7 @@
 
 namespace Azi.TethermoteBase
 {
-    sealed public class DeviceInfo
+    public sealed class DeviceInfo
     {
         public string Name { get; set; }
         public DeviceInformation Device { get; set; }

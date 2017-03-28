@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.Rfcomm;
 using Windows.Devices.Enumeration;
+using Windows.Devices.Radios;
 using Windows.Foundation;
 using Windows.Networking.Sockets;
 
@@ -20,7 +21,7 @@ namespace Azi.TethermoteBase
             return AsyncInfo.Run(async (cancel) => await SendBluetooth(v ? TetheringState.Enabled : TetheringState.Disabled));
         }
 
-        private static readonly Guid serviceUuid = new Guid("5dc6ece2-3e0d-4425-ac00-e444be6b56cb");
+        private static readonly Guid ServiceUuid = new Guid("5dc6ece2-3e0d-4425-ac00-e444be6b56cb");
 
         public static IAsyncOperation<IEnumerable<DeviceInfo>> GetDevices()
         {
@@ -36,6 +37,11 @@ namespace Azi.TethermoteBase
         {
             return AsyncInfo.Run(async (cancel) =>
             {
+                if (!await EnableBluetooh())
+                {
+                    return TetheringState.NoBluetooth;
+                }
+
                 if (AppSettings.RemoteDevice == null) return TetheringState.Error;
                 var device = (await GetDevices()).SingleOrDefault(d => d.Name == AppSettings.RemoteDevice);
                 if (device == null) return TetheringState.Error;
@@ -79,7 +85,7 @@ namespace Azi.TethermoteBase
                 {
                     try
                     {
-                        string selector = RfcommDeviceService.GetDeviceSelector(RfcommServiceId.FromUuid(serviceUuid));
+                        var selector = RfcommDeviceService.GetDeviceSelector(RfcommServiceId.FromUuid(ServiceUuid));
                         var devices = await DeviceInformation.FindAllAsync(selector);
                         var service = devices.SingleOrDefault(d => d.Id.StartsWith(dev.Id, StringComparison.OrdinalIgnoreCase));
                         if (service == null) throw new Exception("Tethermote Service not found");
@@ -116,6 +122,28 @@ namespace Azi.TethermoteBase
                 }
                 return TetheringState.Error;
             });
+        }
+
+        private static async Task<bool> EnableBluetooh()
+        {
+            var result = await Radio.RequestAccessAsync();
+            if (result == RadioAccessStatus.Allowed)
+            {
+                var bluetooth = (await Radio.GetRadiosAsync()).FirstOrDefault(radio => radio.Kind == RadioKind.Bluetooth);
+                if (bluetooth == null)
+                {
+                    return false;
+                }
+
+                if (bluetooth.State != RadioState.On)
+                {
+                    await bluetooth.SetStateAsync(RadioState.On);
+                }
+
+                return true;
+            }
+
+            return false;
         }
     }
 }

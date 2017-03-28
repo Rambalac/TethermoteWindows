@@ -1,5 +1,6 @@
 ﻿using Azi.TethermoteBase;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
@@ -24,8 +25,8 @@ namespace Azi.TethermoteWindows
         /// </summary>
         public App()
         {
-            this.InitializeComponent();
-            this.Suspending += OnSuspending;
+            InitializeComponent();
+            Suspending += OnSuspending;
         }
 
         /// <summary>
@@ -33,10 +34,10 @@ namespace Azi.TethermoteWindows
         /// will be used such as when the application is launched to open a specific file.
         /// </summary>
         /// <param name="args">Details about the launch request and process.</param>
-        protected async override void OnLaunched(LaunchActivatedEventArgs args)
+        protected override async void OnLaunched(LaunchActivatedEventArgs args)
         {
 #if DEBUG
-            this.DebugSettings.EnableFrameRateCounter |= System.Diagnostics.Debugger.IsAttached;
+            DebugSettings.EnableFrameRateCounter |= System.Diagnostics.Debugger.IsAttached;
 #endif
             await RegisterBackgroundTasks();
 
@@ -92,11 +93,10 @@ namespace Azi.TethermoteWindows
         private void RegisterBackgroundTask<T>(string taskName, IBackgroundTrigger trigger)
         {
             // check if task is already registered
-            foreach (var cur in BackgroundTaskRegistration.AllTasks)
-                if (cur.Value.Name == taskName)
-                {
-                    return;
-                }
+            if (BackgroundTaskRegistration.AllTasks.Any(cur => cur.Value.Name == taskName))
+            {
+                return;
+            }
 
             // register a new task
             var taskBuilder = new BackgroundTaskBuilder
@@ -105,7 +105,7 @@ namespace Azi.TethermoteWindows
                 TaskEntryPoint = typeof(T).FullName,
             };
             taskBuilder.SetTrigger(trigger);
-            var myFirstTask = taskBuilder.Register();
+            taskBuilder.Register();
         }
         private const string EnableSwitchArgument = "enable";
         private const string DisableSwitchArgument = "disable";
@@ -116,14 +116,17 @@ namespace Azi.TethermoteWindows
             {
                 var state = await Bluetooth.SwitchTethering(enable);
                 await Tile.UpdateTile(state);
-                if (state == TetheringState.Enabled)
+                switch (state)
                 {
-                    await WiFi.WaitForWiFiConnection();
-                }
-                else
-                    if (state == TetheringState.Error)
-                {
-                    await ShowError();
+                    case TetheringState.Enabled:
+                        await WiFi.WaitForWiFiConnection();
+                        break;
+                    case TetheringState.Error:
+                        await ShowError();
+                        break;
+                    case TetheringState.NoBluetooth:
+                        await ShowBluetoothError();
+                        break;
                 }
             }
             catch (Exception)
@@ -133,10 +136,17 @@ namespace Azi.TethermoteWindows
             Exit();
         }
 
-        static public async Task ShowError()
+        public static async Task ShowError()
         {
             var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
             var dialog = new MessageDialog(loader.GetString("Message_BluetoothError"));
+            await dialog.ShowAsync();
+        }
+
+        public static async Task ShowBluetoothError()
+        {
+            var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
+            var dialog = new MessageDialog(loader.GetString("Message_BluetoothEnableError"));
             await dialog.ShowAsync();
         }
 

@@ -155,4 +155,7 @@ Because of MS Store policy there is no way to mention about Android in this app 
   <data name="Tile_Tooltip_ToEnable" xml:space="preserve">
     <value>Enable WiFi tethering on your device {0}</value>
   </data>
+  <data name="Message_BluetoothEnableError" xml:space="preserve">
+    <value>Can not enable Bluetooth. This device need Bluetooth enabled to control remote device.</value>
+  </data>
 </root>

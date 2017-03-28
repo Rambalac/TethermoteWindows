@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Azi.TethermoteWindows
 {
-    sealed public class Model
+    public sealed class Model
     {
         public bool EnableOnPresent
         {

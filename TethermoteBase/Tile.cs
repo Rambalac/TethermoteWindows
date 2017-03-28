@@ -11,7 +11,7 @@ using Windows.UI.Xaml;
 
 namespace Azi.TethermoteBase
 {
-    sealed public class Tile
+    public sealed class Tile
     {
         private const string SwitchTileId = "SwitchTile";
 

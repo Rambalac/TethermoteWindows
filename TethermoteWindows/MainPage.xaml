@@ -26,19 +26,19 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Button x:Name="button" x:Uid="Main_TapToSwitch" HorizontalAlignment="Stretch" Margin="10,10,10,5" FontSize="40" ClickMode="Press" Click="switchButton_Click" />
-        <ComboBox x:Uid="Main_Devices" x:Name="comboBox" Grid.Row="2" HorizontalAlignment="Stretch" Margin="10,0,10,0" Loaded="comboBox_Loaded" SelectionChanged="comboBox_SelectionChanged" DropDownClosed="comboBox_DropDownClosed">
+        <ComboBox x:Uid="Main_Devices" x:Name="DevicesComboBox" Grid.Row="2" HorizontalAlignment="Stretch" Margin="10,0,10,0" Loaded="comboBox_Loaded" SelectionChanged="comboBox_SelectionChanged" DropDownClosed="comboBox_DropDownClosed">
             <ComboBox.ItemTemplate>
                 <DataTemplate x:DataType="base:DeviceInfo">
                     <TextBlock Text="{x:Bind Name}"/>
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <Button x:Name="addSwitchTileButton" Content="AddTile" x:Uid="Main_AddTile" HorizontalAlignment="Stretch" Margin="10,2,10,0" Grid.Row="3" Click="AddSwitchTileButton_Click"/>
+        <Button Content="AddTile" x:Uid="Main_AddTile" HorizontalAlignment="Stretch" Margin="10,2,10,0" Grid.Row="3" Click="AddSwitchTileButton_Click"/>
 
-        <CheckBox x:Name="enableOnPresent" Content="EnableOnPresent" x:Uid="Main_EnableOnPresent" HorizontalAlignment="Stretch" Margin="10,2,10,0" Grid.Row="5" IsChecked="{Binding EnableOnPresent, Mode=TwoWay}"/>
-        <CheckBox x:Name="disableOnAway" Content="DisableOnAway" x:Uid="Main_DisableOnAway" HorizontalAlignment="Stretch" Margin="10,2,10,0" Grid.Row="6" IsChecked="{Binding DisableOnAway, Mode=TwoWay}"/>
+        <CheckBox Content="EnableOnPresent" x:Uid="Main_EnableOnPresent" HorizontalAlignment="Stretch" Margin="10,2,10,0" Grid.Row="5" IsChecked="{Binding EnableOnPresent, Mode=TwoWay}"/>
+        <CheckBox Content="DisableOnAway" x:Uid="Main_DisableOnAway" HorizontalAlignment="Stretch" Margin="10,2,10,0" Grid.Row="6" IsChecked="{Binding DisableOnAway, Mode=TwoWay}"/>
 
-        <Button x:Name="openDevicesSettings" Content="OpenDevices" x:Uid="Main_OpenDevices" HorizontalAlignment="Stretch" Margin="10,2,10,0" Grid.Row="7" VerticalAlignment="Top" Click="openDevicesSettings_Click" />
-        <Button x:Name="openWifiSettings" Content="OpenWiFi" x:Uid="Main_OpenWiFi" HorizontalAlignment="Stretch" Margin="10,2,10,0" Grid.Row="8" VerticalAlignment="Top" Click="openWifiSettings_Click" />
+        <Button Content="OpenDevices" x:Uid="Main_OpenDevices" HorizontalAlignment="Stretch" Margin="10,2,10,0" Grid.Row="7" VerticalAlignment="Top" Click="openDevicesSettings_Click" />
+        <Button Content="OpenWiFi" x:Uid="Main_OpenWiFi" HorizontalAlignment="Stretch" Margin="10,2,10,0" Grid.Row="8" VerticalAlignment="Top" Click="openWifiSettings_Click" />
     </Grid>
 </Page>

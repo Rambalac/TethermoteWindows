@@ -37,12 +37,12 @@ namespace Azi.TethermoteWindows
 
         public MainPage()
         {
-            this.InitializeComponent();
+            InitializeComponent();
         }
 
         private async void comboBox_Loaded(object sender, RoutedEventArgs e)
         {
-            comboBox.Items.Clear();
+            DevicesComboBox?.Items?.Clear();
             await RefreshDevices();
             timer = new DispatcherTimer
             {
@@ -52,7 +52,7 @@ namespace Azi.TethermoteWindows
             timer.Tick += Timer_Tick; ;
             timer.Start();
 
-            if (comboBox.SelectedItem == null)
+            if (DevicesComboBox.SelectedItem == null)
             {
                 await ShowManual();
             }
@@ -66,13 +66,13 @@ namespace Azi.TethermoteWindows
         private async Task RefreshDevices()
         {
             var devices = (await Bluetooth.GetDevices()).OrderBy(s => s.Name).ToList();
-            var items = comboBox.Items.ToList().OfType<DeviceInfo>().OrderBy(s => s.Name).ToList();
+            var items = DevicesComboBox.Items.ToList().OfType<DeviceInfo>().OrderBy(s => s.Name).ToList();
             if (items.Count == devices.Count && items.SequenceEqual(devices)) return;
-            comboBox.Items.Clear();
+            DevicesComboBox.Items.Clear();
             foreach (var item in devices)
             {
-                comboBox.Items.Add(item);
-                if (item.Name == AppSettings.RemoteDevice) comboBox.SelectedItem = item;
+                DevicesComboBox.Items.Add(item);
+                if (item.Name == AppSettings.RemoteDevice) DevicesComboBox.SelectedItem = item;
             }
         }
 
@@ -111,7 +111,7 @@ namespace Azi.TethermoteWindows
             }
         }
 
-        static public async Task ShowManual()
+        public static async Task ShowManual()
         {
             var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
             var dialog = new MessageDialog(loader.GetString("Message_Manual"));
@@ -120,7 +120,7 @@ namespace Azi.TethermoteWindows
 
         private void comboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            AppSettings.RemoteDevice = ((DeviceInfo)comboBox.SelectedItem)?.Name;
+            AppSettings.RemoteDevice = ((DeviceInfo)DevicesComboBox.SelectedItem)?.Name;
         }
 
         private async void openDevicesSettings_Click(object sender, RoutedEventArgs e)
@@ -148,7 +148,7 @@ namespace Azi.TethermoteWindows
 
         private async void comboBox_DropDownClosed(object sender, object e)
         {
-            if (comboBox.SelectedItem == null)
+            if (DevicesComboBox.SelectedItem == null)
             {
                 await ShowManual();
             }

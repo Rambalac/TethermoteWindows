@@ -9,7 +9,7 @@ using Windows.UI.Popups;
 
 namespace Azi.TethermoteBase
 {
-    sealed public class UserNotPresentBackgroundTask : IBackgroundTask
+    public sealed class UserNotPresentBackgroundTask : IBackgroundTask
     {
         public async void Run(IBackgroundTaskInstance taskInstance)
         {

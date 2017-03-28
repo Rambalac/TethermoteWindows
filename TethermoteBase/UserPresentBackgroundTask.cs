@@ -10,7 +10,7 @@ using Windows.UI.Popups;
 
 namespace Azi.TethermoteBase
 {
-    sealed public class UserPresentBackgroundTask : IBackgroundTask
+    public sealed class UserPresentBackgroundTask : IBackgroundTask
     {
         public async void Run(IBackgroundTaskInstance taskInstance)
         {
@@ -44,7 +44,7 @@ namespace Azi.TethermoteBase
                 try
                 {
                     Debug.WriteLine("User not Present");
-                    ConnectionProfile connections = NetworkInformation.GetInternetConnectionProfile();
+                    var connections = NetworkInformation.GetInternetConnectionProfile();
                     var con=connections.GetNetworkConnectivityLevel();
                     if (con == NetworkConnectivityLevel.InternetAccess||con==NetworkConnectivityLevel.ConstrainedInternetAccess) return;
 
