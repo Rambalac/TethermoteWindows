@@ -11,7 +11,7 @@
     <AssemblyName>Azi.TethermoteWindows</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-    <TargetPlatformVersion>10.0.14393.0</TargetPlatformVersion>
+    <TargetPlatformVersion>10.0.15063.0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.10586.0</TargetPlatformMinVersion>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
@@ -21,6 +21,7 @@
     <AppxBundle>Always</AppxBundle>
     <AppxBundlePlatforms>x86|x64|arm</AppxBundlePlatforms>
     <PackageCertificateThumbprint>F880459791C16FEF1F83312D5901727286C28A58</PackageCertificateThumbprint>
+    <RuntimeIdentifiers>win10-arm;win10-arm-aot;win10-x86;win10-x86-aot;win10-x64;win10-x64-aot</RuntimeIdentifiers>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -97,7 +98,6 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
-    <None Include="project.json" />
     <None Include="TethermoteWindows_StoreKey.pfx" />
     <None Include="TethermoteWindows_TemporaryKey.pfx" />
   </ItemGroup>
@@ -191,9 +191,9 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\GMaster\Tools\Tools.csproj">
-      <Project>{64d5f682-ccfc-4bcc-9268-dbc2a3e36b3c}</Project>
-      <Name>Tools</Name>
+    <ProjectReference Include="..\MVVCTools\MVVCTools.csproj">
+      <Project>{0561d9c5-e168-491e-8c71-53afffe66e5e}</Project>
+      <Name>MVVCTools</Name>
     </ProjectReference>
     <ProjectReference Include="..\TethermoteBase\TethermoteBase.csproj">
       <Project>{63e8a6b2-d657-4587-869b-f175026da727}</Project>
@@ -207,6 +207,14 @@
     <SDKReference Include="Microsoft.VCLibs, Version=14.0">
       <Name>Visual C++ 2015 Runtime for Universal Windows Platform Apps</Name>
     </SDKReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
+      <Version>5.3.2</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Services.Store.SDK">
+      <Version>10.1703.19001</Version>
+    </PackageReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

@@ -75,7 +75,7 @@
                     <Button.Flyout>
                         <Flyout local:BindableFlyout.ItemsSource="{Binding Donations.DonationItems, Mode=TwoWay}">
                             <local:BindableFlyout.ItemTemplate>
-                                <DataTemplate x:DataType="store:StoreProduct">
+                                <DataTemplate x:DataType="local:DonationItem">
                                     <MenuFlyoutItem Text="{Binding Title}" Command="{StaticResource DonateCommand}" CommandParameter="{Binding StoreId}" Click="MenuFlyoutItem_OnClick"/>
                                 </DataTemplate>
                             </local:BindableFlyout.ItemTemplate>

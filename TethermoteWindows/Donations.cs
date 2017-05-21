@@ -9,6 +9,13 @@
     using System.Threading.Tasks;
     using Windows.Services.Store;
 
+    public class DonationItem
+    {
+        public string Title { get; set; }
+        public string StoreId { get; set; }
+        public Uri Icon { get; set; }
+    }
+
     public class Donations : INotifyPropertyChanged
     {
         private static StoreContext context;
@@ -19,7 +26,7 @@
 
         public static StoreContext Context => context ?? (context = StoreContext.GetDefault());
 
-        public static ObservableCollection<FakeStoreProduct> DonationItems { get; } = new ObservableCollection<FakeStoreProduct>();
+        public static ObservableCollection<DonationItem> DonationItems { get; } = new ObservableCollection<DonationItem>();
 
         public bool CanDonate
         {
@@ -53,12 +60,6 @@
             }
         }
 
-        public class FakeStoreProduct
-        {
-            public string Title { get; set; } = "fgsdgf";
-            public string StoreId { get; set; } = "3452354353";
-        }
-
         public static async Task Init(string donationTag)
         {
             try
@@ -70,13 +71,15 @@
                     return;
                 }
 
-                DonationItems.Add(new FakeStoreProduct());
-
-                //var productsValues = prods.Products.Values.ToList();
-                //foreach (var item in productsValues.Where(p => p.Keywords.Contains(donationTag)))
-                //{
-                //    DonationItems.Add(item);
-                //}
+                var productsValues = prods.Products.Values.ToList();
+                foreach (var item in productsValues.Where(p => p.Keywords.Contains(donationTag))
+                    .Select(i => new DonationItem {
+                        Title = i.Title,
+                        StoreId = i.StoreId
+                    }))
+                {
+                    DonationItems.Add(item);
+                }
             }
             catch (Exception e)
             {
