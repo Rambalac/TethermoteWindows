@@ -1,1 +1,1 @@
-C:\Users\Rambalac.RAMBALAC-SURFAC\Documents\Visual Studio 2015\Projects\TethermoteWindows\TethermoteWindows\AppPackages\TethermoteWindows_1.1.2.0\TethermoteWindows_1.1.2.0_x86_x64_arm.appxbundle
+H:\Projects\C#\TethermoteWindows\TethermoteWindows\bin\ARM\Release\Upload\TethermoteWindows_1.1.4.0\TethermoteWindows_1.1.4.0_x86_x64_arm.appxbundle

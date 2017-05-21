@@ -6,39 +6,84 @@
     xmlns:base="using:Azi.TethermoteBase"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:store="using:Windows.Services.Store"
     mc:Ignorable="d" Loaded="Page_Loaded">
+    <Page.Resources>
+        <local:DonateCommand x:Key="DonateCommand" Model="{Binding}" />
+        <local:VisibilityConverter x:Key="VisibilityConverter" />
+        <local:NotConverter x:Key="NotConverter" />
+        <local:AboutCommand x:Key="AboutCommand" />
+        <local:FeedbackCommand x:Key="FeedbackCommand" />
+    </Page.Resources>
     <Page.DataContext>
-        <local:Model/>
+        <local:Model />
     </Page.DataContext>
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="20"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="20"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="20" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="20" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
+            <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <Button x:Name="SwitchButton" x:Uid="Main_TapToSwitch" HorizontalAlignment="Stretch" Margin="10,10,10,5" FontSize="40" ClickMode="Press" Click="SwitchButton_Click" />
         <ComboBox x:Uid="Main_Devices" x:Name="DevicesComboBox" Grid.Row="2" HorizontalAlignment="Stretch" Margin="10,0,10,0" Loaded="ComboBox_Loaded" SelectionChanged="ComboBox_SelectionChanged" DropDownClosed="ComboBox_DropDownClosed">
             <ComboBox.ItemTemplate>
                 <DataTemplate x:DataType="base:DeviceInfo">
-                    <TextBlock Text="{x:Bind Name}"/>
+                    <TextBlock Text="{x:Bind Name}" />
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <Button Content="AddTile" x:Uid="Main_AddTile" HorizontalAlignment="Stretch" Margin="10,2,10,0" Grid.Row="3" Click="AddSwitchTileButton_Click"/>
+        <Button Content="AddTile" x:Uid="Main_AddTile" HorizontalAlignment="Stretch" Margin="10,2,10,0" Grid.Row="3" Click="AddSwitchTileButton_Click" />
 
-        <CheckBox Content="EnableOnPresent" x:Uid="Main_EnableOnPresent" HorizontalAlignment="Stretch" Margin="10,2,10,0" Grid.Row="5" IsChecked="{Binding EnableOnPresent, Mode=TwoWay}"/>
-        <CheckBox Content="DisableOnAway" x:Uid="Main_DisableOnAway" HorizontalAlignment="Stretch" Margin="10,2,10,0" Grid.Row="6" IsChecked="{Binding DisableOnAway, Mode=TwoWay}"/>
+        <ToggleSwitch OffContent="EnableOnPresent" x:Uid="Main_EnableOnPresent" HorizontalAlignment="Stretch" Margin="10,2,10,0" Grid.Row="5" IsOn="{Binding EnableOnPresent, Mode=TwoWay}" />
+        <ToggleSwitch OffContent="DisableOnAway" x:Uid="Main_DisableOnAway" HorizontalAlignment="Stretch" Margin="10,2,10,0" Grid.Row="6" IsOn="{Binding DisableOnAway, Mode=TwoWay}" />
 
         <Button Content="OpenDevices" x:Uid="Main_OpenDevices" HorizontalAlignment="Stretch" Margin="10,2,10,0" Grid.Row="7" VerticalAlignment="Top" Click="OpenDevicesSettings_Click" />
         <Button Content="OpenWiFi" x:Uid="Main_OpenWiFi" HorizontalAlignment="Stretch" Margin="10,2,10,0" Grid.Row="8" VerticalAlignment="Top" Click="OpenWifiSettings_Click" />
+
+        <Grid Grid.Row="10" Grid.Column="0" Margin="0,0,10,0">
+            <StackPanel Orientation="Horizontal">
+                <StackPanel Margin="0,0,10,0">
+                    <Button HorizontalAlignment="Center" Command="{StaticResource FeedbackCommand}" Padding="10">
+                        <TextBlock FontFamily="Segoe MDL2 Assets" FontSize="30" Text="&#xE939;" HorizontalAlignment="Center" />
+                    </Button>
+                    <TextBlock Text="Feedback" Margin="5" />
+                </StackPanel>
+                <StackPanel Margin="0,0,10,0">
+                    <Button HorizontalAlignment="Center" Command="{StaticResource AboutCommand}"  Padding="10">
+                        <TextBlock FontFamily="Segoe MDL2 Assets" FontSize="30" Text="&#xE11B;" HorizontalAlignment="Center" />
+                    </Button>
+                    <TextBlock Text="Help" TextAlignment="Center" Margin="5" />
+                </StackPanel>
+            </StackPanel>
+            <StackPanel HorizontalAlignment="Right" Visibility="{Binding Donations.CanDonate, Converter={StaticResource VisibilityConverter}}">
+                <Button x:Name="DonationsButton" HorizontalAlignment="Center" Padding="10" IsEnabled="{Binding Donations.InProgress, Converter= {StaticResource NotConverter}}">
+                    <Grid>
+                        <TextBlock FontFamily="Segoe MDL2 Assets" FontSize="30" Text="&#xE9BB;" HorizontalAlignment="Center" />
+                        <ProgressRing  IsActive="{Binding Donations.InProgress}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                    </Grid>
+                    <Button.Flyout>
+                        <Flyout local:BindableFlyout.ItemsSource="{Binding Donations.DonationItems, Mode=TwoWay}">
+                            <local:BindableFlyout.ItemTemplate>
+                                <DataTemplate x:DataType="store:StoreProduct">
+                                    <MenuFlyoutItem Text="{Binding Title}" Command="{StaticResource DonateCommand}" CommandParameter="{Binding StoreId}" Click="MenuFlyoutItem_OnClick"/>
+                                </DataTemplate>
+                            </local:BindableFlyout.ItemTemplate>
+                        </Flyout>
+                    </Button.Flyout>
+                </Button>
+                <TextBlock Text="Donate" TextAlignment="Center" Margin="5" />
+            </StackPanel>
+        </Grid>
     </Grid>
 </Page>

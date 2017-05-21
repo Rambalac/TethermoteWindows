@@ -16,11 +16,11 @@
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <PackageCertificateKeyFile>TethermoteWindows_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <PackageCertificateKeyFile>TethermoteWindows_StoreKey.pfx</PackageCertificateKeyFile>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <AppxBundle>Always</AppxBundle>
     <AppxBundlePlatforms>x86|x64|arm</AppxBundlePlatforms>
-    <PackageCertificateThumbprint>0B286BB4D18344682C4E680FA7BE002018A07182</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>F880459791C16FEF1F83312D5901727286C28A58</PackageCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -98,17 +98,26 @@
   <ItemGroup>
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
     <None Include="project.json" />
+    <None Include="TethermoteWindows_StoreKey.pfx" />
     <None Include="TethermoteWindows_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AboutCommand.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="BindableFlyout.cs" />
+    <Compile Include="DonateCommand.cs" />
+    <Compile Include="Donations.cs" />
+    <Compile Include="FeedbackCommand.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Model.cs" />
+    <Compile Include="NotConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VisibilityConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -182,10 +191,22 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\GMaster\Tools\Tools.csproj">
+      <Project>{64d5f682-ccfc-4bcc-9268-dbc2a3e36b3c}</Project>
+      <Name>Tools</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TethermoteBase\TethermoteBase.csproj">
       <Project>{63e8a6b2-d657-4587-869b-f175026da727}</Project>
       <Name>TethermoteBase</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <SDKReference Include="Microsoft.Services.Store.Engagement, Version=10.0">
+      <Name>Microsoft Engagement Framework</Name>
+    </SDKReference>
+    <SDKReference Include="Microsoft.VCLibs, Version=14.0">
+      <Name>Visual C++ 2015 Runtime for Universal Windows Platform Apps</Name>
+    </SDKReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

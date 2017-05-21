@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
-using System.Text;
 using System.Threading.Tasks;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.Rfcomm;
@@ -16,12 +15,18 @@ namespace Azi.TethermoteBase
 {
     public static class Bluetooth
     {
-        public static IAsyncOperation<TetheringState> SwitchTethering(bool v)
-        {
-            return AsyncInfo.Run(async (cancel) => await SendBluetooth(v ? TetheringState.Enabled : TetheringState.Disabled));
-        }
-
         private static readonly Guid ServiceUuid = new Guid("5dc6ece2-3e0d-4425-ac00-e444be6b56cb");
+
+        public static IAsyncOperation<StreamSocket> ConnectDevice(DeviceInformation dev)
+        {
+            return AsyncInfo.Run(async (cancel) =>
+            {
+                var service = await RfcommDeviceService.FromIdAsync(dev.Id);
+                var socket = new StreamSocket();
+                await socket.ConnectAsync(service.ConnectionHostName, service.ConnectionServiceName, SocketProtectionLevel.BluetoothEncryptionWithAuthentication);
+                return socket;
+            });
+        }
 
         public static IAsyncOperation<IEnumerable<DeviceInfo>> GetDevices()
         {
@@ -48,32 +53,6 @@ namespace Azi.TethermoteBase
                 var result = await SendBluetooth(device.Device, state);
 
                 return result;
-            });
-        }
-
-        public static IAsyncOperation<StreamSocket> ConnectDevice(DeviceInformation dev)
-        {
-            return AsyncInfo.Run(async (cancel) =>
-            {
-                var service = await RfcommDeviceService.FromIdAsync(dev.Id);
-                var socket = new StreamSocket();
-                await socket.ConnectAsync(service.ConnectionHostName, service.ConnectionServiceName, SocketProtectionLevel.BluetoothEncryptionWithAuthentication);
-                return socket;
-            });
-        }
-
-        private static IAsyncAction PingDevice(string id)
-        {
-            return AsyncInfo.Run(async (cancel) =>
-            {
-                var bl = await BluetoothDevice.FromIdAsync(id);
-                var service = (await bl.GetRfcommServicesAsync()).Services.FirstOrDefault();
-                if (service == null) return;
-
-                using (var socket = new StreamSocket())
-                {
-                    await socket.ConnectAsync(service.ConnectionHostName, service.ConnectionServiceName, SocketProtectionLevel.BluetoothEncryptionWithAuthentication);
-                }
             });
         }
 
@@ -124,6 +103,11 @@ namespace Azi.TethermoteBase
             });
         }
 
+        public static IAsyncOperation<TetheringState> SwitchTethering(bool v)
+        {
+            return AsyncInfo.Run(async (cancel) => await SendBluetooth(v ? TetheringState.Enabled : TetheringState.Disabled));
+        }
+
         private static async Task<bool> EnableBluetooh()
         {
             var result = await Radio.RequestAccessAsync();
@@ -144,6 +128,21 @@ namespace Azi.TethermoteBase
             }
 
             return false;
+        }
+
+        private static IAsyncAction PingDevice(string id)
+        {
+            return AsyncInfo.Run(async (cancel) =>
+            {
+                var bl = await BluetoothDevice.FromIdAsync(id);
+                var service = (await bl.GetRfcommServicesAsync()).Services.FirstOrDefault();
+                if (service == null) return;
+
+                using (var socket = new StreamSocket())
+                {
+                    await socket.ConnectAsync(service.ConnectionHostName, service.ConnectionServiceName, SocketProtectionLevel.BluetoothEncryptionWithAuthentication);
+                }
+            });
         }
     }
 }

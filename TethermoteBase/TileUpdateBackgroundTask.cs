@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Windows.ApplicationModel.Background;
-using Windows.UI.Popups;
 
 namespace Azi.TethermoteBase
 {
@@ -18,7 +13,6 @@ namespace Azi.TethermoteBase
             {
                 var state = await Bluetooth.SendBluetooth(TetheringState.GetState);
                 await Tile.UpdateTile(state);
-
             }
             catch (Exception ex)
             {

@@ -1,35 +1,25 @@
-﻿using Azi.TethermoteBase;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Azi.TethermoteWindows
+﻿namespace Azi.TethermoteWindows
 {
-    public sealed class Model
+    using System.ComponentModel;
+    using System.Runtime.CompilerServices;
+    using TethermoteBase;
+
+    public sealed class Model : INotifyPropertyChanged
     {
-        public bool EnableOnPresent
-        {
-            get
-            {
-                return AppSettings.EnableOnUserPresent;
-            }
-            set
-            {
-                AppSettings.EnableOnUserPresent = value;
-            }
-        }
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public bool DisableOnAway
         {
-            get
-            {
-                return AppSettings.DisableOnUserNotPresent;
-            }
-            set
-            {
-                AppSettings.DisableOnUserNotPresent = value;
-            }
+            get => AppSettings.DisableOnUserNotPresent;
+            set => AppSettings.DisableOnUserNotPresent = value;
+        }
+
+        public Donations Donations { get; } = new Donations();
+
+        public bool EnableOnPresent
+        {
+            get => AppSettings.EnableOnUserPresent;
+            set => AppSettings.EnableOnUserPresent = value;
         }
     }
 }

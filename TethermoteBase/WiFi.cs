@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
-using System.Text;
 using System.Threading.Tasks;
 using Windows.Devices.Enumeration;
 using Windows.Devices.Radios;
@@ -33,7 +31,7 @@ namespace Azi.TethermoteBase
                         cancel.ThrowIfCancellationRequested();
                         await wifiAdapter.ScanAsync();
                         await Task.Delay(100);
-                        if ((await wifiAdapter.NetworkAdapter.GetConnectedProfileAsync()) != null) break;
+                        if (await wifiAdapter.NetworkAdapter.GetConnectedProfileAsync() != null) break;
                     }
                 }
             });

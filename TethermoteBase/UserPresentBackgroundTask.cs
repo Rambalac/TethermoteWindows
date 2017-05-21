@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Windows.ApplicationModel.Background;
 using Windows.Networking.Connectivity;
-using Windows.UI.Popups;
 
 namespace Azi.TethermoteBase
 {
@@ -24,7 +19,6 @@ namespace Azi.TethermoteBase
                     {
                         var state = await Bluetooth.SendBluetooth(TetheringState.GetState);
                         await Tile.UpdateTile(state);
-
                     }
                     catch (Exception ex)
                     {
@@ -45,8 +39,8 @@ namespace Azi.TethermoteBase
                 {
                     Debug.WriteLine("User not Present");
                     var connections = NetworkInformation.GetInternetConnectionProfile();
-                    var con=connections.GetNetworkConnectivityLevel();
-                    if (con == NetworkConnectivityLevel.InternetAccess||con==NetworkConnectivityLevel.ConstrainedInternetAccess) return;
+                    var con = connections.GetNetworkConnectivityLevel();
+                    if (con == NetworkConnectivityLevel.InternetAccess || con == NetworkConnectivityLevel.ConstrainedInternetAccess) return;
 
                     var state = await Bluetooth.SwitchTethering(true);
                     await Tile.UpdateTile(state);

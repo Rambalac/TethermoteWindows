@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
-  <Identity Name="51338Rambalac.Tethermote" Publisher="CN=Rambalac" Version="1.1.2.0" />
-  <mp:PhoneIdentity PhoneProductId="1d1d39aa-4756-4f7a-a2ff-9c1ea5a543c8" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
+  <Identity Name="51338Rambalac.Tethermote" Publisher="CN=92765C0E-C69D-491B-9315-91859F5319B9" Version="1.1.4.0" />
+  <mp:PhoneIdentity PhoneProductId="cec39947-dd2e-48e2-be39-77250a0cdd72" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>Tethermote</DisplayName>
     <PublisherDisplayName>Rambalac</PublisherDisplayName>
@@ -15,7 +15,7 @@
   </Resources>
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="TethermoteWindows.App">
-      <uap:VisualElements DisplayName="Tethermote Settings" Square150x150Logo="assets\Medium\Medium150x150Logo.png" Square44x44Logo="assets\AppList\AppList44x44Logo.png" Description="Switch WiFi tethering remotely on Android devices with same app installed https://play.google.com/store/apps/details?id=com.azi.tethermote&amp;hl=en" BackgroundColor="transparent">
+      <uap:VisualElements DisplayName="Tethermote" Square150x150Logo="assets\Medium\Medium150x150Logo.png" Square44x44Logo="assets\AppList\AppList44x44Logo.png" Description="Switch WiFi tethering remotely on Android devices with same app installed https://play.google.com/store/apps/details?id=com.azi.tethermote&amp;hl=en" BackgroundColor="transparent">
         <uap:DefaultTile Wide310x150Logo="assets\Wide\Wide310x150Logo.png" Square71x71Logo="assets\Small\Small71x71Logo.png" Square310x310Logo="assets\Large\Large310x310Logo.png">
         </uap:DefaultTile>
         <uap:SplashScreen Image="assets\SplashScreen\SplashScreen.png" />

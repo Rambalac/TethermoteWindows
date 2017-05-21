@@ -123,10 +123,10 @@
   <data name="Main_Devices.Header" xml:space="preserve">
     <value>Remote device name</value>
   </data>
-  <data name="Main_DisableOnAway.Content" xml:space="preserve">
+  <data name="Main_DisableOnAway.OffContent" xml:space="preserve">
     <value>Disable tethering when user is away (Not reliable)</value>
   </data>
-  <data name="Main_EnableOnPresent.Content" xml:space="preserve">
+  <data name="Main_EnableOnPresent.OffContent" xml:space="preserve">
     <value>Enable tethering when user is present (Not reliable)</value>
   </data>
   <data name="Main_OpenDevices.Content" xml:space="preserve">
@@ -157,5 +157,11 @@ Because of MS Store policy there is no way to mention about Android in this app 
   </data>
   <data name="Message_BluetoothEnableError" xml:space="preserve">
     <value>Can not enable Bluetooth. This device need Bluetooth enabled to control remote device.</value>
+  </data>
+  <data name="Main_DisableOnAway.OnContent" xml:space="preserve">
+    <value>Disable tethering when user is away (Not reliable)</value>
+  </data>
+  <data name="Main_EnableOnPresent.OnContent" xml:space="preserve">
+    <value>Enable tethering when user is present (Not reliable)</value>
   </data>
 </root>

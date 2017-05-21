@@ -4,8 +4,10 @@ namespace Azi.TethermoteBase
 {
     public sealed class DeviceInfo
     {
-        public string Name { get; set; }
         public DeviceInformation Device { get; set; }
+
+        public string Name { get; set; }
+
         // override object.Equals
         public override bool Equals(object obj)
         {
