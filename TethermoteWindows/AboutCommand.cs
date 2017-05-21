@@ -1,7 +1,7 @@
 ﻿namespace Azi.TethermoteWindows
 {
+    using Mvvc;
     using System;
-    using Tools;
 
     public class AboutCommand : AbstractSimpleCommand
     {

@@ -1,7 +1,7 @@
-namespace Tools
-{
-    using Windows.UI.Xaml;
+using Windows.UI.Xaml;
 
+namespace Azi.Mvvc
+{
     public abstract class AbstractModelUserBase : DependencyObject
     {
         public static readonly DependencyProperty ModelProperty = DependencyProperty.Register(

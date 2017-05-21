@@ -1,8 +1,8 @@
-namespace Tools
-{
-    using System;
-    using System.Windows.Input;
+using System;
+using System.Windows.Input;
 
+namespace Azi.Mvvc
+{
     public abstract class AbstractSimpleCommand : ICommand
     {
         public event EventHandler CanExecuteChanged;

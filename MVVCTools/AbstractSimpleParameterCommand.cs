@@ -1,9 +1,9 @@
-namespace Tools
-{
-    using System;
-    using System.Threading.Tasks;
-    using System.Windows.Input;
+using System;
+using System.Threading.Tasks;
+using System.Windows.Input;
 
+namespace Azi.Mvvc
+{
     public abstract class AbstractSimpleParameterCommand<TParameter> : ICommand
     {
         public event EventHandler CanExecuteChanged;

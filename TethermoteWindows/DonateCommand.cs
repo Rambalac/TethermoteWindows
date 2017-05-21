@@ -1,8 +1,8 @@
 namespace Azi.TethermoteWindows
 {
+    using Mvvc;
     using System;
     using System.Threading.Tasks;
-    using Tools;
     using Windows.Services.Store;
     using Windows.UI.Popups;
 

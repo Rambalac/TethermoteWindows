@@ -1,7 +1,6 @@
 ﻿namespace Azi.TethermoteWindows
 {
     using System.ComponentModel;
-    using System.Runtime.CompilerServices;
     using TethermoteBase;
 
     public sealed class Model : INotifyPropertyChanged

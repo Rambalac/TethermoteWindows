@@ -1,10 +1,10 @@
-namespace Tools
-{
-    using System;
-    using System.ComponentModel;
-    using System.Threading.Tasks;
-    using System.Windows.Input;
+using System;
+using System.ComponentModel;
+using System.Threading.Tasks;
+using System.Windows.Input;
 
+namespace Azi.Mvvc
+{
     public abstract class AbstractParameterModelCommand<TModel, TParameter> : AbstractModelUser<TModel>, ICommand
         where TModel : INotifyPropertyChanged
     {

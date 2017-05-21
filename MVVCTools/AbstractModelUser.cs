@@ -1,4 +1,4 @@
-namespace Tools
+namespace Azi.Mvvc
 {
     public abstract class AbstractModelUser<TModel> : AbstractModelUserBase
     {

@@ -1,1 +1,1 @@
-H:\Projects\C#\TethermoteWindows\TethermoteWindows\bin\ARM\Release\Upload\TethermoteWindows_1.1.4.0\TethermoteWindows_1.1.4.0_x86_x64_arm.appxbundle
+D:\Projects\C#\TethermoteWindows\TethermoteWindows\bin\ARM\Release\Upload\TethermoteWindows_1.1.5.0\TethermoteWindows_1.1.5.0_x86_x64_arm.appxbundle
